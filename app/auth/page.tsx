@@ -643,10 +643,10 @@ export default function AuthPage() {
 
                 <button
                   onClick={handleVerifyOtp}
-                  disabled={!otpComplete || otpState === 'verifying'}
+                  disabled={!otpComplete || otpState === 'verifying' || otpState === 'sending'}
                   className={cn(
                     'w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all active:scale-[0.97] min-h-[48px]',
-                    otpComplete && otpState !== 'verifying'
+                    otpComplete && otpState !== 'verifying' && otpState !== 'sending'
                       ? 'bg-saffron text-cream hover:bg-saffron-light shadow-sm'
                       : 'bg-cream-dark text-brown-muted/50 cursor-not-allowed'
                   )}
