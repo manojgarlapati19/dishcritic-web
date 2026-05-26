@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -141,7 +142,7 @@ export function ReviewForm({ onSubmit, className }: ReviewFormProps) {
               </label>
               {photoPreview && (
                 <div className="relative w-16 h-16 rounded-md overflow-hidden">
-                  <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={photoPreview} alt="Preview" className="w-full h-full object-cover" width={64} height={64} unoptimized />
                   <button
                     type="button"
                     onClick={() => {

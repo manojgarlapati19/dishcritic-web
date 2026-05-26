@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { timeAgo } from '@/lib/utils'
 import { StarRating } from './StarRating'
@@ -57,10 +58,12 @@ export function ReviewCard({ review, className }: ReviewCardProps) {
 
           {/* Photo */}
           {review.photo_url && (
-            <img
+            <Image
               src={review.photo_url}
               alt="Review photo"
               className="mt-2 rounded-lg max-h-48 object-cover"
+              width={500}
+              height={300}
             />
           )}
 

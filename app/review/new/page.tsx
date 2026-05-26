@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import {
   Search,
@@ -838,7 +839,7 @@ function Step3RateDishes({
                   </label>
                   {rating.photoPreview && (
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden">
-                      <img src={rating.photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                      <Image src={rating.photoPreview} alt="Preview" className="w-full h-full object-cover" width={48} height={48} unoptimized />
                       <button
                         onClick={() => {
                           onUpdateDishRating(dishId, { photoFile: null, photoPreview: null })

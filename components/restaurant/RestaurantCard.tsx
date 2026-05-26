@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { formatScore } from '@/lib/utils'
@@ -25,7 +26,7 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
         {/* Photo */}
         <div className="w-20 h-20 rounded-lg bg-cream-darker flex-shrink-0 overflow-hidden">
           {restaurant.photo_urls?.[0] ? (
-            <img src={restaurant.photo_urls[0]} alt={restaurant.name} className="w-full h-full object-cover" />
+            <Image src={restaurant.photo_urls[0]} alt={restaurant.name} className="w-full h-full object-cover" width={80} height={80} />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <span className="text-2xl">🍽️</span>

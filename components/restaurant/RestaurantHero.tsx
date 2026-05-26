@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,10 +18,12 @@ export function RestaurantHero({ restaurant, className }: RestaurantHeroProps) {
       {/* Cover Image */}
       <div className="h-48 sm:h-64 rounded-xl overflow-hidden bg-cream-dark">
         {restaurant.photo_urls?.[0] ? (
-          <img
+          <Image
             src={restaurant.photo_urls[0]}
             alt={restaurant.name}
             className="w-full h-full object-cover"
+            width={1200}
+            height={400}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

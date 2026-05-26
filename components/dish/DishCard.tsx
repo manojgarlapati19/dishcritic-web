@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/utils'
@@ -26,7 +27,7 @@ export function DishCard({ dish, className }: DishCardProps) {
         {/* Dish Image Placeholder */}
         <div className="w-16 h-16 rounded-lg bg-cream-dark flex items-center justify-center flex-shrink-0 overflow-hidden">
           {dish.photo_url ? (
-            <img src={dish.photo_url} alt={dish.name} className="w-full h-full object-cover" />
+            <Image src={dish.photo_url} alt={dish.name} className="w-full h-full object-cover" width={64} height={64} />
           ) : (
             <UtensilsCrossed className="w-6 h-6 text-brown-muted" />
           )}

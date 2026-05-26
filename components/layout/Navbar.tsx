@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Menu, Search, MapPin, Award, Store, PenSquare, User, LogOut, Bookmark, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'
@@ -86,10 +87,12 @@ export function Navbar() {
                 >
                   <div className="w-8 h-8 rounded-full bg-saffron flex items-center justify-center">
                     {user.avatar_url ? (
-                      <img
+                      <Image
                         src={user.avatar_url}
                         alt={user.name}
                         className="w-full h-full rounded-full object-cover"
+                        width={32}
+                        height={32}
                       />
                     ) : (
                       <span className="text-cream font-bold text-sm">{getUserInitial()}</span>

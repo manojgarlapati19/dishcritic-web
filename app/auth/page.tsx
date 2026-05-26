@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import {
@@ -268,7 +269,7 @@ export default function AuthPage() {
 
   // Phone
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [otpState, setOtpState] = useState<OtpState>('idle')
+  const [otpState, setOtpState] = useState<'idle' | 'sending' | 'sent' | 'verifying' | 'verified'>('idle')
   const [otpValue, setOtpValue] = useState<string[]>(Array(6).fill(''))
   const [countdownComplete, setCountdownComplete] = useState(false)
   const [otpError, setOtpError] = useState(false)
@@ -761,7 +762,7 @@ export default function AuthPage() {
                   {avatarPreview && (
                     <div className="flex items-center gap-3 mt-2">
                       <div className="w-10 h-10 rounded-full overflow-hidden">
-                        <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                        <Image src={avatarPreview} alt="Preview" className="w-full h-full object-cover" width={40} height={40} unoptimized />
                       </div>
                       <button
                         onClick={() => {
