@@ -269,7 +269,7 @@ export default function AuthPage() {
 
   // Phone
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [otpState, setOtpState] = useState<'idle' | 'sending' | 'sent' | 'verifying' | 'verified'>('idle')
+  const [otpState, setOtpState] = useState<'idle' | 'sent' | 'verifying' | 'verified'>('idle')
   const [otpValue, setOtpValue] = useState<string[]>(Array(6).fill(''))
   const [countdownComplete, setCountdownComplete] = useState(false)
   const [otpError, setOtpError] = useState(false)
