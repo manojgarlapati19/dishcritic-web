@@ -290,7 +290,7 @@ const SAMPLE_SAVED: SavedRestaurant[] = [
   { id: 3, name: 'Ulavacharu', area: 'Jubilee Hills', city: 'Hyderabad', cuisineType: ['Andhra'], overallScore: 8.2 },
   { id: 4, name: 'ABs - Absolute Barbecues', area: 'Banjara Hills', city: 'Hyderabad', cuisineType: ['Multi-Cuisine', 'BBQ'], overallScore: 7.9 },
   { id: 5, name: 'The Fishermans Wharf', area: 'Gachibowli', city: 'Hyderabad', cuisineType: ['Goan', 'Coastal'], overallScore: 8.1 },
-  { id: 6, name: 'Ohri''s', area: 'Jubilee Hills', city: 'Hyderabad', cuisineType: ['North Indian', 'Mughlai'], overallScore: 7.8 },
+  { id: 6, name: "Ohri's", area: 'Jubilee Hills', city: 'Hyderabad', cuisineType: ['North Indian', 'Mughlai'], overallScore: 7.8 },
 ]
 
 const SAMPLE_TASTE_PROFILE: TasteProfileData = {
