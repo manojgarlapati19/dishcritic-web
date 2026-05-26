@@ -295,6 +295,7 @@ export default function AuthPage() {
   const [sessionUserId, setSessionUserId] = useState<string | null>(null)
 
   const otpComplete = otpValue.every((d) => d !== '')
+  const isVerifyingOtp = otpState === 'verifying'
 
   const handleCountdownComplete = useCallback(() => {
     setCountdownComplete(true)
@@ -601,8 +602,8 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* OTP SENT */}
-            {otpState === 'sent' && (
+            {/* OTP SENT / VERIFYING */}
+            {(otpState === 'sent' || isVerifyingOtp) && (
               <div className="space-y-4 animate-fade-in">
                 <div>
                   <p className="text-sm font-medium text-ink mb-2.5 text-center">
@@ -643,15 +644,15 @@ export default function AuthPage() {
 
                 <button
                   onClick={handleVerifyOtp}
-                  disabled={!otpComplete || otpState === 'verifying' || otpState === 'sending'}
+                  disabled={!otpComplete || isVerifyingOtp}
                   className={cn(
                     'w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all active:scale-[0.97] min-h-[48px]',
-                    otpComplete && otpState !== 'verifying' && otpState !== 'sending'
+                    otpComplete && !isVerifyingOtp
                       ? 'bg-saffron text-cream hover:bg-saffron-light shadow-sm'
                       : 'bg-cream-dark text-brown-muted/50 cursor-not-allowed'
                   )}
                 >
-                  {otpState === 'verifying' ? (
+                  {isVerifyingOtp ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Verifying...

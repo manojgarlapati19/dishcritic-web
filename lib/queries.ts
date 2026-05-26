@@ -331,7 +331,7 @@ export async function getSavedRestaurants(userId: string): Promise<Restaurant[]>
     console.error('Error fetching saved restaurants:', error)
     return []
   }
-  return (data || []).map((d: { restaurant: Restaurant }) => d.restaurant)
+  return (data || []).map((d: { restaurant: Restaurant | Restaurant[] }) => Array.isArray(d.restaurant) ? d.restaurant[0] : d.restaurant)
 }
 
 // ─── Helpful Votes ──────────────────────────────────────────────────────────

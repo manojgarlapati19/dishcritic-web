@@ -1039,7 +1039,7 @@ function Step4Submit({
             </div>
             <div>
               <h3 className="text-sm font-semibold text-ink">{restaurant.name}</h3>
-              <p className="text-xs text-brown-muted">{restaurant.area}, {restaurant.city}</p>
+              <p className="text-xs text-brown-muted">{restaurant.address}, {restaurant.city?.name || ''}</p>
             </div>
           </div>
           <button onClick={onBack} className="text-xs text-saffron hover:underline font-medium">

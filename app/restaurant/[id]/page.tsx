@@ -165,8 +165,8 @@ export default function RestaurantPage() {
           <nav className="flex items-center gap-2 text-xs sm:text-sm text-brown-muted">
             <Link href="/" className="hover:text-saffron transition-colors">Home</Link>
             <ChevronRight className="w-3 h-3" />
-            <Link href={`/search?city=${encodeURIComponent(displayRestaurant.city || 'Hyderabad')}`} className="hover:text-saffron transition-colors">
-              {displayRestaurant.city || 'Hyderabad'}
+            <Link href={`/search?city=${encodeURIComponent(typeof displayRestaurant.city === 'object' ? displayRestaurant.city?.name || '' : displayRestaurant.city || 'Hyderabad')}`} className="hover:text-saffron transition-colors">
+              {typeof displayRestaurant.city === 'object' ? displayRestaurant.city?.name : displayRestaurant.city || 'Hyderabad'}
             </Link>
             <ChevronRight className="w-3 h-3" />
             <span className="text-ink font-medium">{displayRestaurant.name}</span>
@@ -221,7 +221,7 @@ export default function RestaurantPage() {
                     <div className="flex flex-wrap items-center gap-3 text-sm text-brown-muted mb-3">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5" />
-                        {displayRestaurant.city || 'Hyderabad'}
+                        {typeof displayRestaurant.city === 'object' ? displayRestaurant.city?.name : displayRestaurant.city || 'Hyderabad'}
                       </span>
                       <span className="w-1 h-1 rounded-full bg-brown-muted/30" />
                       <span className="text-lg font-semibold text-ink">

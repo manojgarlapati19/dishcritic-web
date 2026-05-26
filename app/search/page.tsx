@@ -583,7 +583,7 @@ function TopResultCard({ dish, viewMode }: { dish: DishResult; viewMode: ViewMod
       <div className={cn(viewMode === 'grid' ? '' : 'flex')}>
         {/* Photo */}
         <div className={cn(viewMode === 'grid' ? 'h-48' : 'w-48 min-h-full shrink-0', 'relative')}>
-          <PhotoPlaceholder seed={dish.id} className="!rounded-none w-full h-full" />
+          <PhotoPlaceholder seed={parseInt(dish.id, 10) || 0} className="!rounded-none w-full h-full" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           {/* Score on photo for mobile overlap */}
           <div className={cn('absolute bottom-3 left-3', viewMode === 'list' && 'hidden')}>
@@ -630,10 +630,7 @@ function TopResultCard({ dish, viewMode }: { dish: DishResult; viewMode: ViewMod
             ))}
           </div>
 
-          {/* Top Review */}
-          <p className="text-sm text-brown-muted/80 italic mt-3 leading-relaxed border-l-2 border-saffron/30 pl-3">
-            {dish.topReview}
-          </p>
+
 
           {/* Actions */}
           <div className="flex flex-wrap gap-2 mt-4">
@@ -662,7 +659,7 @@ function RegularResultCard({ dish, viewMode }: { dish: DishResult; viewMode: Vie
     >
       {/* Photo */}
       <div className={cn(viewMode === 'grid' ? 'h-40' : 'w-28 h-28 shrink-0', 'relative')}>
-        <PhotoPlaceholder seed={dish.id} className="!rounded-none w-full h-full" />
+        <PhotoPlaceholder seed={parseInt(dish.id, 10) || 0} className="!rounded-none w-full h-full" />
         {viewMode === 'grid' && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         )}
@@ -870,7 +867,7 @@ function SearchPageContent() {
           city: d.restaurant?.city?.name || '',
           score: d.score,
           reviewCount: d.review_count,
-          price: d.price || 0,
+          price: Number(d.price) || 0,
           isVeg: d.is_veg,
           isHalal: d.is_halal,
           dietaryTags: [
