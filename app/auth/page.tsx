@@ -612,7 +612,7 @@ export default function AuthPage() {
                     length={6}
                     value={otpValue}
                     onChange={setOtpValue}
-                    disabled={otpState === 'verifying'}
+                    disabled={false}
                     hasError={otpError}
                   />
                   {otpError && (
