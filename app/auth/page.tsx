@@ -586,7 +586,7 @@ export default function AuthPage() {
                       setPhoneNumber(val)
                     }}
                     placeholder="98765 43210"
-                    disabled={otpState === 'sending' || otpState === 'sent' || loading}
+                    disabled={otpState === 'sending' || otpState === 'sent' || otpState === 'verifying' || loading}
                     className="flex-1 px-3.5 py-3 bg-cream-dark border border-brown-muted/15 rounded-r-xl text-sm text-ink placeholder:text-brown-muted/40 focus:outline-none focus:ring-2 focus:ring-saffron/30 focus:border-saffron/50 transition-all disabled:opacity-50"
                   />
                 </div>
