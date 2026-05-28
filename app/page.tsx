@@ -14,7 +14,7 @@ export default function HomePage() {
             </div>
             <h1 className="font-serif text-7xl font-light leading-none tracking-tight text-[#1E1208] mb-6">
               Find India&apos;s<br/>
-              <em className="text-[#C8702A]">Best Dishes,</em><br/>
+              <em className="font-serif italic text-[#C8702A]">Best Dishes,</em><br/>
               Not Just Restaurants
             </h1>
             <p className="text-[#A08060] text-lg font-light leading-relaxed max-w-md mb-10">
@@ -57,6 +57,22 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* MARQUEE */}
+      <div className="border-t border-b border-[rgba(107,66,38,0.12)] bg-[#F0E6CE] py-3 overflow-hidden">
+        <div className="flex whitespace-nowrap animate-marquee">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="flex items-center gap-0 flex-shrink-0">
+              {['4.2 Lakh Dishes Reviewed','47 Indian Cities','18,000+ Restaurants','Dish-Level Search \u2014 Only on DishCritic','2.1 Lakh Verified Reviewers'].map(item => (
+                <span key={item} className="inline-flex items-center gap-3 px-8 text-xs font-bold tracking-widest uppercase text-[#A08060]">
+                  <span className="w-1 h-1 bg-[#C8702A] rounded-full flex-shrink-0"></span>
+                  {item}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* STATS */}
       <div className="grid grid-cols-4 border-t border-b border-[rgba(107,66,38,0.12)]">
@@ -141,17 +157,14 @@ export default function HomePage() {
           </h2>
           <div className="grid grid-cols-4 gap-5">
             {[
-              { emoji: '🫓', name: 'Masala Dosa', rest: 'MTR · Bengaluru', score: '9.6', badge: '🔥 Viral', tags: ['Veg','South Indian'] },
-              { emoji: '🥘', name: 'Dal Makhani', rest: 'Bukhara · Delhi', score: '9.3', badge: '📈 Rising', tags: ['Veg','North Indian'] },
-              { emoji: '🥣', name: 'Misal Pav', rest: 'Mamledar · Thane', score: '9.4', badge: '🔥 Viral', tags: ['Veg','Spicy'] },
-              { emoji: '🍢', name: 'Vada Pav', rest: 'Ashok · Mumbai', score: '9.1', badge: '⭐ New Entry', tags: ['Veg','Street Food'] },
+              { emoji: '🫓', name: 'Masala Dosa', rest: 'MTR · Bengaluru', score: '9.6', badge: '🔥 Viral', tags: ['Veg','South Indian'], gradient: 'linear-gradient(135deg, #EDE0C4, #D4B878)' },
+              { emoji: '🥘', name: 'Dal Makhani', rest: 'Bukhara · Delhi', score: '9.3', badge: '📈 Rising', tags: ['Veg','North Indian'], gradient: 'linear-gradient(135deg, #F0D9C0, #C8906A)' },
+              { emoji: '🥣', name: 'Misal Pav', rest: 'Mamledar · Thane', score: '9.4', badge: '🔥 Viral', tags: ['Veg','Spicy'], gradient: 'linear-gradient(135deg, #E8D5B0, #B89050)' },
+              { emoji: '🍢', name: 'Vada Pav', rest: 'Ashok · Mumbai', score: '9.1', badge: '⭐ New Entry', tags: ['Veg','Street Food'], gradient: 'linear-gradient(135deg, #F5E8D0, #D4A060)' },
             ].map((dish) => (
               <div key={dish.name} className="group relative bg-white border border-[rgba(107,66,38,0.12)] rounded-xl overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-500 cursor-pointer">
-                <div className="h-36 bg-gradient-to-br from-[#C8702A]/20 via-[#F5EDD9] to-[#F0E6CE] flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent"></div>
-                  <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-[#C8702A]/5"></div>
-                  <div className="absolute -bottom-3 -left-3 w-12 h-12 rounded-full bg-[#C8702A]/8"></div>
-                  <span className="text-5xl relative z-10 group-hover:scale-110 transition-transform duration-500">{dish.emoji}</span>
+                <div className="w-full h-44 flex items-center justify-center text-6xl relative overflow-hidden" style={{background: dish.gradient}}>
+                  <span className="relative z-10 group-hover:scale-110 transition-transform duration-500">{dish.emoji}</span>
                   <div className="absolute top-3 left-3 z-10">
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8702A] text-white">{dish.badge}</span>
                   </div>
@@ -203,8 +216,8 @@ export default function HomePage() {
               { number: '03', emoji: '✍️', title: 'Share your review', desc: 'Rate each dish, upload a photo. Done in 60 seconds. Help thousands find their next great meal.' },
             ].map((step) => (
               <div key={step.number} className="relative bg-white p-10 hover:bg-[#FBF6EE] transition-colors duration-500 group">
-                <span className="absolute top-4 right-6 font-serif text-7xl font-bold text-[rgba(107,66,38,0.04)] select-none pointer-events-none">{step.number}</span>
-                <div className="text-4xl mb-5">{step.emoji}</div>
+                <div className="absolute top-0 left-0 font-serif text-8xl font-bold text-[#F0E6CE] leading-none select-none pointer-events-none">{step.number}</div>
+                <div className="text-4xl mb-5 relative z-10">{step.emoji}</div>
                 <h3 className="font-serif text-xl font-bold text-[#1E1208] mb-3 relative z-10">{step.title}</h3>
                 <p className="text-sm text-[#A08060] leading-relaxed relative z-10">{step.desc}</p>
               </div>
@@ -241,9 +254,9 @@ export default function HomePage() {
                 dish: 'Vada Pav · Ashok\'s', stars: 5,
               },
             ].map((review) => (
-              <div key={review.name} className="group relative bg-white rounded-2xl border border-[rgba(107,66,38,0.12)] p-8 hover:shadow-lg transition-all duration-500">
-                <div className="absolute top-0 left-8 right-8 h-0.5 bg-[#C8702A] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-full"></div>
-                <div className="font-serif text-6xl text-[#C8702A]/20 leading-none mb-2">&ldquo;</div>
+              <div key={review.name} className="group relative bg-white rounded-2xl border border-[rgba(107,66,38,0.12)] p-8 hover:shadow-lg transition-all duration-500 overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C8702A] to-[#E08030] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                <span className="font-serif text-6xl font-bold text-[#F0E6CE] leading-none block mb-2">&ldquo;</span>
                 <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F0E6CE] text-[#9A6240] mb-4">{review.dish}</span>
                 <p className="font-serif italic text-base text-[#1E1208] leading-relaxed mb-6">&ldquo;{review.quote}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-[rgba(107,66,38,0.08)]">
@@ -282,9 +295,10 @@ export default function HomePage() {
               { emoji: '🎨', name: 'Kolkata', count: '1,720' },
             ].map(city => (
               <a key={city.name} href={`/cities/${city.name.toLowerCase()}`} className="bg-white border border-[rgba(107,66,38,0.12)] rounded-xl p-6 text-center hover:border-[#C8702A] hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
-                <div className="text-3xl mb-3">{city.emoji}</div>
-                <div className="text-xs font-bold tracking-wider uppercase text-[#1E1208] mb-1">{city.name}</div>
-                <div className="text-xs text-[#A08060]">{city.count} restaurants</div>
+                <div className="text-3xl mb-2">{city.emoji}</div>
+                <div className="text-xs font-bold tracking-wider uppercase text-[#1E1208] mb-0.5">{city.name}</div>
+                <div className="text-xs text-[#A08060] mb-1">restaurants</div>
+                <div className="font-serif text-3xl font-bold text-[#C8702A]">{city.count}</div>
               </a>
             ))}
           </div>
