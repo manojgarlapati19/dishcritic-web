@@ -129,6 +129,143 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TRENDING */}
+      <section className="px-14 py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
+            <span className="w-6 h-px bg-[#C8702A]"></span>
+            Blowing up right now
+          </div>
+          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
+            Trending Dishes <em className="text-[#C8702A]">This Week</em>
+          </h2>
+          <div className="grid grid-cols-4 gap-5">
+            {[
+              { emoji: '🫓', name: 'Masala Dosa', rest: 'MTR · Bengaluru', score: '9.6', badge: '🔥 Viral', tags: ['Veg','South Indian'] },
+              { emoji: '🥘', name: 'Dal Makhani', rest: 'Bukhara · Delhi', score: '9.3', badge: '📈 Rising', tags: ['Veg','North Indian'] },
+              { emoji: '🥣', name: 'Misal Pav', rest: 'Mamledar · Thane', score: '9.4', badge: '🔥 Viral', tags: ['Veg','Spicy'] },
+              { emoji: '🍢', name: 'Vada Pav', rest: 'Ashok · Mumbai', score: '9.1', badge: '⭐ New Entry', tags: ['Veg','Street Food'] },
+            ].map((dish) => (
+              <div key={dish.name} className="group relative bg-white border border-[rgba(107,66,38,0.12)] rounded-xl overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-500 cursor-pointer">
+                <div className="h-36 bg-gradient-to-br from-[#C8702A]/20 via-[#F5EDD9] to-[#F0E6CE] flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent"></div>
+                  <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-[#C8702A]/5"></div>
+                  <div className="absolute -bottom-3 -left-3 w-12 h-12 rounded-full bg-[#C8702A]/8"></div>
+                  <span className="text-5xl relative z-10 group-hover:scale-110 transition-transform duration-500">{dish.emoji}</span>
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8702A] text-white">{dish.badge}</span>
+                  </div>
+                </div>
+                <div className="p-5 space-y-3">
+                  <div>
+                    <h3 className="font-serif text-lg font-bold text-[#1E1208] group-hover:text-[#C8702A] transition-colors">{dish.name}</h3>
+                    <p className="text-xs text-[#A08060] mt-0.5">{dish.rest}</p>
+                  </div>
+                  <div className="flex gap-1.5">
+                    {dish.tags.map((tag) => (
+                      <span key={tag} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                        tag === 'Veg' ? 'bg-green-100 text-green-700' :
+                        tag === 'Non-Veg' ? 'bg-red-100 text-red-700' :
+                        'bg-[#F5EDD9] text-[#9A6240]'
+                      }`}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-[rgba(107,66,38,0.08)]">
+                    <div className="flex items-center gap-1">
+                      <span className="text-[#C8702A] font-bold font-sans text-base">{dish.score}</span>
+                      <span className="text-xs text-[#A08060]">/10</span>
+                    </div>
+                    <span className="text-xs text-[#A08060]">★ 4.8K reviews</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="bg-white px-14 py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
+            <span className="w-6 h-px bg-[#C8702A]"></span>
+            Simple process
+          </div>
+          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
+            How It <em className="text-[#C8702A]">Works</em>
+          </h2>
+          <div className="grid grid-cols-3 gap-px bg-[rgba(107,66,38,0.08)] rounded-2xl overflow-hidden border border-[rgba(107,66,38,0.08)]">
+            {[
+              { number: '01', emoji: '🔍', title: 'Search any dish', desc: 'Type the dish you\'re craving — get it ranked across every restaurant in your city.' },
+              { number: '02', emoji: '⭐', title: 'Read dish-level reviews', desc: 'Every review is for a specific dish, not just the restaurant. Compare scores from real visitors.' },
+              { number: '03', emoji: '✍️', title: 'Share your review', desc: 'Rate each dish, upload a photo. Done in 60 seconds. Help thousands find their next great meal.' },
+            ].map((step) => (
+              <div key={step.number} className="relative bg-white p-10 hover:bg-[#FBF6EE] transition-colors duration-500 group">
+                <span className="absolute top-4 right-6 font-serif text-7xl font-bold text-[rgba(107,66,38,0.04)] select-none pointer-events-none">{step.number}</span>
+                <div className="text-4xl mb-5">{step.emoji}</div>
+                <h3 className="font-serif text-xl font-bold text-[#1E1208] mb-3 relative z-10">{step.title}</h3>
+                <p className="text-sm text-[#A08060] leading-relaxed relative z-10">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* REVIEWS */}
+      <section className="bg-[#F0E6CE] px-14 py-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
+            <span className="w-6 h-px bg-[#C8702A]"></span>
+            Community voices
+          </div>
+          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
+            What Foodies <em className="text-[#C8702A]">Are Saying</em>
+          </h2>
+          <div className="grid grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Arjun Mehta', title: 'Biryani Expert', initials: 'AM',
+                quote: 'The rice is perfectly cooked — each grain separate, every one soaked in saffron. No biryani in this city even comes close.',
+                dish: 'Hyderabadi Dum Biryani', stars: 5,
+              },
+              {
+                name: 'Priya Nair', title: 'South Indian Expert', initials: 'PN',
+                quote: 'MTR\'s batter has that perfect overnight fermented sourness you simply cannot replicate at home. A benchmark for all dosas.',
+                dish: 'Masala Dosa · MTR', stars: 5,
+              },
+              {
+                name: 'Rahul Singh', title: 'Street Food Fanatic', initials: 'RS',
+                quote: 'I\'ve had this 40+ times and it never changes. The dry chutney ratio is perfect. That consistency is the mark of a true legend.',
+                dish: 'Vada Pav · Ashok\'s', stars: 5,
+              },
+            ].map((review) => (
+              <div key={review.name} className="group relative bg-white rounded-2xl border border-[rgba(107,66,38,0.12)] p-8 hover:shadow-lg transition-all duration-500">
+                <div className="absolute top-0 left-8 right-8 h-0.5 bg-[#C8702A] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-full"></div>
+                <div className="font-serif text-6xl text-[#C8702A]/20 leading-none mb-2">&ldquo;</div>
+                <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F0E6CE] text-[#9A6240] mb-4">{review.dish}</span>
+                <p className="font-serif italic text-base text-[#1E1208] leading-relaxed mb-6">&ldquo;{review.quote}&rdquo;</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-[rgba(107,66,38,0.08)]">
+                  <div className="w-10 h-10 rounded-full bg-[#C8702A]/10 flex items-center justify-center shrink-0">
+                    <span className="text-sm font-bold text-[#C8702A]">{review.initials}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[#1E1208] truncate">{review.name}</p>
+                    <p className="text-xs text-[#A08060]">{review.title}</p>
+                  </div>
+                  <div className="flex gap-0.5 shrink-0">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} className={`text-sm ${i < review.stars ? 'text-[#C8702A]' : 'text-[rgba(107,66,38,0.15)]'}`}>★</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CITIES */}
       <section className="bg-[#F0E6CE] px-14 py-20">
         <div className="max-w-7xl mx-auto">
@@ -147,8 +284,7 @@ export default function HomePage() {
               <a key={city.name} href={`/cities/${city.name.toLowerCase()}`} className="bg-white border border-[rgba(107,66,38,0.12)] rounded-xl p-6 text-center hover:border-[#C8702A] hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
                 <div className="text-3xl mb-3">{city.emoji}</div>
                 <div className="text-xs font-bold tracking-wider uppercase text-[#1E1208] mb-1">{city.name}</div>
-                <div className="text-xs text-[#A08060]">{city.count}</div>
-                <div className="text-xs text-[#C8702A] font-bold mt-2">{city.count}</div>
+                <div className="text-xs text-[#A08060]">{city.count} restaurants</div>
               </a>
             ))}
           </div>
