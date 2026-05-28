@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/utils'
 import { ScoreBadge } from '@/components/shared/ScoreBadge'
 import { DietaryTag } from '@/components/shared/DietaryTag'
-import { UtensilsCrossed, MapPin } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import type { Dish, Restaurant } from '@/types'
 
 interface DishCardProps {
@@ -29,7 +29,9 @@ export function DishCard({ dish, className }: DishCardProps) {
           {dish.photo_url ? (
             <Image src={dish.photo_url} alt={dish.name} className="w-full h-full object-cover" width={64} height={64} />
           ) : (
-            <UtensilsCrossed className="w-6 h-6 text-brown-muted" />
+            <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center text-4xl">
+              🍽️
+            </div>
           )}
         </div>
 

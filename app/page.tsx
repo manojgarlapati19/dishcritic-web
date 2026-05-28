@@ -72,12 +72,12 @@ const DEFAULT_LEADERBOARD = [
 ]
 
 const DEFAULT_CITIES: CityEmoji[] = [
-  { emoji: '🌆', name: 'Mumbai', restaurantCount: 3200 },
   { emoji: '🕌', name: 'Hyderabad', restaurantCount: 1240 },
-  { emoji: '🌤️', name: 'Bengaluru', restaurantCount: 2500 },
+  { emoji: '🌆', name: 'Mumbai', restaurantCount: 3200 },
+  { emoji: '🌿', name: 'Bengaluru', restaurantCount: 2500 },
   { emoji: '🏛️', name: 'Delhi', restaurantCount: 2800 },
-  { emoji: '🏖️', name: 'Chennai', restaurantCount: 1800 },
-  { emoji: '🎭', name: 'Kolkata', restaurantCount: 1500 },
+  { emoji: '🐟', name: 'Chennai', restaurantCount: 1800 },
+  { emoji: '🎨', name: 'Kolkata', restaurantCount: 1500 },
 ]
 
 interface CityEmoji {
@@ -89,10 +89,10 @@ interface CityEmoji {
 const CITY_EMOJIS: Record<string, string> = {
   'Mumbai': '🌆',
   'Hyderabad': '🕌',
-  'Bengaluru': '🌤️',
+  'Bengaluru': '🌿',
   'Delhi': '🏛️',
-  'Chennai': '🏖️',
-  'Kolkata': '🎭',
+  'Chennai': '🐟',
+  'Kolkata': '🎨',
   'Pune': '🏗️',
   'Ahmedabad': '🏛️',
   'Jaipur': '🏯',
@@ -218,10 +218,10 @@ export default function HomePage() {
   }
 
   const STATS_DISPLAY = [
-    { value: formatStat(stats.dishCount), label: 'Dishes' },
-    { value: stats.cityCount + '+', label: 'Cities' },
-    { value: formatStat(stats.restaurantCount), label: 'Restaurants' },
-    { value: formatStat(stats.reviewerCount), label: 'Reviewers' },
+    { value: '4.2L', label: 'Dishes Reviewed' },
+    { value: '47+', label: 'Indian Cities' },
+    { value: '18K', label: 'Restaurants' },
+    { value: '2.1L', label: 'Verified Reviewers' },
   ]
 
   const handleSearch = () => {
@@ -350,16 +350,8 @@ export default function HomePage() {
       {/* ═══════ 2. SCROLLING MARQUEE ═══════ */}
       <FadeUpSection>
         <section className="border-t border-b border-brown-muted/10 bg-cream-darker py-4 overflow-hidden">
-          <div className="relative flex overflow-x-hidden">
-            <div className="animate-marquee flex items-center gap-12 whitespace-nowrap py-1">
-              {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-                <span key={i} className="flex items-center gap-12">
-                  <span className="text-sm font-medium text-brown-muted tracking-wide">{item}</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-saffron/40" />
-                </span>
-              ))}
-            </div>
-            <div className="absolute top-0 left-0 animate-marquee2 flex items-center gap-12 whitespace-nowrap py-1">
+          <div className="overflow-hidden whitespace-nowrap">
+            <div className="inline-flex items-center gap-12 animate-marquee-new py-1">
               {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
                 <span key={i} className="flex items-center gap-12">
                   <span className="text-sm font-medium text-brown-muted tracking-wide">{item}</span>
@@ -631,58 +623,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-      </FadeUpSection>
-
-      {/* ═══════ 10. FOOTER ═══════ */}
-      <FadeUpSection>
-        <footer className="bg-cream-dark border-t border-brown-muted/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
-              <div className="lg:col-span-2">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">🍽️</span>
-                  <span className="font-serif text-xl font-bold text-ink">DishCritic</span>
-                </div>
-                <p className="text-sm text-brown-muted leading-relaxed max-w-xs">
-                  India&apos;s first dish-first restaurant review platform. Find the best dishes in your city, ranked by people who love food as much as you do.
-                </p>
-                <div className="flex items-center gap-3 mt-6">
-                  {['𝕏', '📷', '💼', '▶️'].map((icon, i) => (
-                    <div key={i} className="w-9 h-9 rounded-full bg-cream border border-brown-muted/15 flex items-center justify-center text-sm hover:border-saffron/40 hover:text-saffron hover:bg-saffron/5 transition-all cursor-pointer">
-                      {icon}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {[
-                { title: 'Discover', links: ['Search Dishes', 'City Rankings', 'Trending Now', 'Top Restaurants', 'Food Guides'] },
-                { title: 'For Restaurants', links: ['Claim Listing', 'Promote Dishes', 'Analytics', 'Review Responses', 'Pricing'] },
-                { title: 'Company', links: ['About Us', 'Careers', 'Press Kit', 'Blog', 'Contact'] },
-              ].map((col) => (
-                <div key={col.title}>
-                  <h4 className="text-xs font-semibold text-ink uppercase tracking-widest mb-4">{col.title}</h4>
-                  <ul className="space-y-3">
-                    {col.links.map((link) => (
-                      <li key={link}>
-                        <a href="#" className="text-sm text-brown-muted hover:text-saffron transition-colors">{link}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="border-t border-brown-muted/10 py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
-              <p className="text-xs text-brown-muted">&copy; {new Date().getFullYear()} DishCritic. All rights reserved.</p>
-              <div className="flex items-center gap-4">
-                <a href="#" className="text-xs text-brown-muted hover:text-saffron transition-colors">Privacy Policy</a>
-                <span className="text-brown-muted/30">·</span>
-                <a href="#" className="text-xs text-brown-muted hover:text-saffron transition-colors">Terms of Service</a>
-              </div>
-            </div>
-          </div>
-        </footer>
       </FadeUpSection>
     </div>
   )
