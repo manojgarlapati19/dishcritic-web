@@ -8,7 +8,7 @@ import {
   BarChart3, Settings, LogOut, ExternalLink, Menu, X,
   Plus, Search, Edit3, Trash2, Eye, Check, X as XIcon,
   AlertTriangle, Bell, Download, ShieldAlert,
-  UserWarning, CheckCircle2, Flag, RefreshCw,
+  CheckCircle2, Flag, RefreshCw,
   CircleDot, ToggleLeft, ToggleRight, Camera,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -892,7 +892,7 @@ export default function AdminPage() {
                     onClick={() => setReviews(prev => prev.map(rev => rev.id === r.id ? { ...rev, status: 'deleted' } : rev))}>
                     <Trash2 className="w-3 h-3" /> Delete Review
                   </Button>
-                  <Button size="sm" variant="outline" className="text-xs gap-1"><UserWarning className="w-3 h-3" /> Warn User</Button>
+                  <Button size="sm" variant="outline" className="text-xs gap-1"><AlertTriangle className="w-3 h-3" /> Warn User</Button>
                   <Button size="sm" variant="outline" className="text-xs gap-1 text-red-600"><ShieldAlert className="w-3 h-3" /> Ban User</Button>
                 </div>
               </div>
@@ -1033,8 +1033,7 @@ export default function AdminPage() {
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Eye className="w-3.5 h-3.5" /></Button>
                       {u.status === 'active' && (
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-amber-600"
-                          onClick={() => { setWarnUserId(u.id); setShowWarnUser(true) }}>
-                          <UserWarning className="w-3.5 h-3.5" />
+                          onClick={() => { setWarnUserId(u.id); setShowWarnUser(true) }}>                           <AlertTriangle className="w-3.5 h-3.5" />
                         </Button>
                       )}
                       {u.status !== 'banned' && (
@@ -1529,7 +1528,7 @@ export default function AdminPage() {
                   <p className="text-sm font-medium text-ink mb-2">Warning History</p>
                   <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm">
                     <div className="flex items-center gap-2 mb-1">
-                      <UserWarning className="w-4 h-4 text-amber-600" />
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
                       <span className="text-xs font-medium text-amber-800">Warning issued on 2024-01-20</span>
                     </div>
                     <p className="text-xs text-amber-700">Reason: Inappropriate language in review of &quot;Butter Chicken&quot;</p>
@@ -1541,7 +1540,7 @@ export default function AdminPage() {
             {u.status === 'active' && (
               <div className="flex items-center gap-2 pt-2">
                 <Button size="sm" variant="outline" className="text-xs gap-1 text-amber-600 border-amber-200">
-                  <UserWarning className="w-3 h-3" /> Warn User
+                  <AlertTriangle className="w-3 h-3" /> Warn User
                 </Button>
                 <Button size="sm" variant="outline" className="text-xs gap-1 text-red-600 border-red-200">
                   <ShieldAlert className="w-3 h-3" /> Ban User

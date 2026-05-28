@@ -88,7 +88,7 @@ export default function CitiesPage() {
             {filteredCities.map((city) => (
               <Link
                 key={city.id}
-                href={`/search?city=${encodeURIComponent(city.name)}`}
+                href={`/cities/${city.id}`}
                 className="group relative rounded-2xl bg-cream border border-brown-muted/10 overflow-hidden hover:-translate-y-1.5 hover:shadow-xl hover:border-saffron/30 transition-all duration-500"
               >
                 {/* Top Gradient */}
