@@ -19,9 +19,26 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'DishCritic — Find India\'s Best Dishes',
+  title: {
+    default: 'DishCritic — Find India\'s Best Dishes',
+    template: '%s | DishCritic',
+  },
   description: 'Search any dish. Find who makes it best. Dish-level reviews across 47 Indian cities.',
-  keywords: ['dish reviews', 'restaurant reviews', 'Indian food', 'biryani', 'food ratings'],
+  keywords: ['dish reviews', 'restaurant reviews', 'Indian food', 'biryani', 'best restaurants India'],
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: 'https://dishcritic.vercel.app',
+    siteName: 'DishCritic',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@dishcritic',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({
