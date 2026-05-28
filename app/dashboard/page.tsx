@@ -544,9 +544,8 @@ export default function DashboardPage() {
     )
   }
 
-  const renderContent = () => {
-    const section = (() => {
-      switch (activeTab) {
+  const renderSection = () => {
+    switch (activeTab) {
       case 'overview': return <OverviewSection />
       case 'reviews': return <ReviewsSection />
       case 'menu': return <MenuSection />
@@ -554,13 +553,14 @@ export default function DashboardPage() {
       case 'rankings': return <RankingsSection />
       case 'settings': return <SettingsSection />
       default: return <OverviewSection />
-    })()
-    return (
-      <div key={activeTab} className="animate-fade-in">
-        {section}
-      </div>
-    )
+    }
   }
+
+  const renderContent = () => (
+    <div key={activeTab} className="animate-fade-in">
+      {renderSection()}
+    </div>
+  )
 
   /* ─── OVERVIEW ─────────────────────────────────────────────────────── */
   const OverviewSection = () => (
