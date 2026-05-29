@@ -2,118 +2,95 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCities, getTopDishes, getPlatformStats } from '@/lib/queries'
-import type { City, Dish } from '@/types'
+import Link from 'next/link'
 
 export default function HomePage() {
   const router = useRouter()
-  const [cities, setCities] = useState<City[]>([])
-  const [topDishes, setTopDishes] = useState<Dish[]>([])
-  const [stats, setStats] = useState({ dishes: 0, restaurants: 0, cities: 0 })
   const [searchQuery, setSearchQuery] = useState('')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [citiesData, dishesData, statsData] = await Promise.all([
-          getCities(),
-          getTopDishes(8),
-          getPlatformStats(),
-        ])
-        setCities(citiesData || [])
-        setTopDishes(dishesData || [])
-        setStats(statsData)
-      } catch (err) {
-        console.error('Error loading homepage data:', err)
-      }
-    }
-    loadData()
+    setMounted(true)
   }, [])
 
-  const formatCount = (n: number) => {
-    if (n >= 100000) return (n / 100000).toFixed(1) + 'L'
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
-    return String(n)
-  }
-
   return (
-    <div className="min-h-screen bg-[#FBF6EE]">
+    <main className="min-h-screen" style={{backgroundColor: '#FBF6EE'}}>
       
       {/* HERO */}
-      <section className="min-h-screen flex items-center px-14 py-32">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-[#FDF0E4] border border-[#C8702A]/25 text-[#C8702A] text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-8">
-              <span className="w-1.5 h-1.5 bg-[#C8702A] rounded-full"></span>
-              India&apos;s dish-first review platform
-            </div>
-            <h1 className="font-serif text-7xl font-light leading-none tracking-tight text-[#1E1208] mb-6">
-              Find India&apos;s<br/>
-              <em className="font-serif italic text-[#C8702A]">Best Dishes,</em><br/>
-              Not Just Restaurants
-            </h1>
-            <p className="text-[#A08060] text-lg font-light leading-relaxed max-w-md mb-10">
-              Search any dish. Get ranked results by that specific dish — not the overall restaurant. {stats.dishes.toLocaleString()} reviews across {stats.cities} Indian cities.
-            </p>
-            <div className="flex items-center bg-white border-2 border-[rgba(107,66,38,0.2)] rounded-lg overflow-hidden max-w-lg shadow-lg focus-within:border-[#C8702A]">
-              <span className="px-4 text-[#A08060] text-lg">🔍</span>
-              <input 
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && router.push(`/search?q=${encodeURIComponent(searchQuery)}`)}
-                placeholder='Try "Hyderabadi Biryani", "Masala Dosa"...'
-                className="flex-1 py-4 px-2 bg-transparent outline-none text-[#1E1208] placeholder-[#C4A882]"
-              />
-              <button 
-                onClick={() => router.push(`/search?q=${encodeURIComponent(searchQuery)}`)}
-                className="bg-[#C8702A] text-white px-8 py-4 font-bold text-sm tracking-wider uppercase hover:bg-[#E08030] transition-colors"
-              >
-                Search →
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {['🍛 Biryani','🥘 Butter Chicken','🫓 Masala Dosa','🍢 Vada Pav','🫕 Chole Bhature'].map(chip => {
-                const searchTerm = chip.replace(/^[^\s]*\s/, '')
-                return (
-                  <span 
-                    key={chip} 
-                    onClick={() => router.push(`/search?q=${encodeURIComponent(searchTerm)}`)}
-                    className="text-xs text-[#9A6240] bg-[#F0E6CE] border border-[rgba(107,66,38,0.15)] px-3 py-2 rounded-full cursor-pointer hover:border-[#C8702A] hover:text-[#C8702A] transition-all"
-                  >
-                    {chip}
-                  </span>
-                )
-              })}
-            </div>
+      <section style={{minHeight: '100vh', padding: '140px 56px 80px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center'}}>
+        <div>
+          <div style={{display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#FDF0E4', border: '1px solid rgba(200,112,42,0.25)', color: '#C8702A', fontSize: '11px', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '6px 14px 6px 8px', borderRadius: '999px', marginBottom: '32px'}}>
+            <span style={{width: '6px', height: '6px', background: '#C8702A', borderRadius: '50%'}}></span>
+            India&apos;s dish-first review platform
           </div>
-          <div className="relative h-[500px]">
-            {[
-              { name: 'Hyderabadi Dum Biryani', rest: 'Paradise Restaurant', score: '9.4', emoji: '🍛', top: '40px', left: '20px' },
-              { name: 'Masala Dosa', rest: 'MTR · Bengaluru', score: '9.6', emoji: '🫓', bottom: '80px', right: '0px' },
-              { name: 'Vada Pav', rest: "Ashok's · Mumbai", score: '9.1', emoji: '🍢', top: '0px', right: '30px' },
-            ].map((dish) => (
-              <div key={dish.name} style={{ position: 'absolute', top: dish.top, left: dish.left, right: dish.right, bottom: dish.bottom }} className="bg-white border border-[rgba(107,66,38,0.15)] rounded-xl shadow-xl p-4 w-52">
-                <div className="text-4xl mb-3">{dish.emoji}</div>
-                <div className="text-sm font-bold text-[#1E1208] mb-1">{dish.name}</div>
-                <div className="text-xs text-[#A08060] mb-2">{dish.rest}</div>
-                <div className="inline-flex items-center gap-1 bg-[#C8702A] text-white text-xs font-bold px-2 py-1 rounded">
-                  ★ {dish.score}
-                </div>
-              </div>
+          
+          <h1 style={{fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 'clamp(52px, 6vw, 88px)', fontWeight: '300', lineHeight: '0.96', letterSpacing: '-1.5px', color: '#1E1208', marginBottom: '28px'}}>
+            <strong style={{display: 'block', fontWeight: '600'}}>Find India&apos;s</strong>
+            <em style={{display: 'block', fontStyle: 'italic', color: '#C8702A', fontWeight: '400'}}>Best Dishes,</em>
+            <span style={{display: 'block'}}>Not Just Restaurants</span>
+          </h1>
+          
+          <p style={{fontSize: '16px', fontWeight: '300', lineHeight: '1.85', color: '#A08060', maxWidth: '420px', marginBottom: '44px'}}>
+            Search any dish. Get ranked results by that specific dish — not the overall restaurant. 4.2 lakh reviews across 47 Indian cities.
+          </p>
+          
+          <div style={{display: 'flex', alignItems: 'center', background: 'white', border: '1.5px solid rgba(107,66,38,0.2)', borderRadius: '5px', overflow: 'hidden', maxWidth: '540px', boxShadow: '0 8px 40px rgba(107,66,38,0.1)'}}>
+            <span style={{padding: '0 16px', fontSize: '18px', color: '#A08060', flexShrink: 0}}>🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && searchQuery && router.push(`/search?q=${searchQuery}`)}
+              placeholder='Try "Hyderabadi Biryani", "Masala Dosa"...'
+              style={{flex: 1, border: 'none', outline: 'none', fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '15px', fontWeight: '400', color: '#1E1208', padding: '16px 8px', background: 'transparent'}}
+            />
+            <button
+              onClick={() => searchQuery && router.push(`/search?q=${searchQuery}`)}
+              style={{background: '#C8702A', border: 'none', cursor: 'pointer', padding: '0 28px', height: '100%', minHeight: '56px', fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '12px', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'white', flexShrink: 0, transition: 'background 0.2s'}}
+              onMouseOver={e => e.currentTarget.style.background='#E08030'}
+              onMouseOut={e => e.currentTarget.style.background='#C8702A'}
+            >
+              Search →
+            </button>
+          </div>
+          
+          <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '18px'}}>
+            {['🍛 Biryani','🥘 Butter Chicken','🫓 Masala Dosa','🍢 Vada Pav','🫕 Chole Bhature'].map(chip => (
+              <button
+                key={chip}
+                onClick={() => router.push(`/search?q=${chip.split(' ').slice(1).join(' ')}`)}
+                style={{fontSize: '12px', fontWeight: '400', color: '#9A6240', background: '#F0E6CE', border: '1px solid rgba(107,66,38,0.15)', padding: '7px 14px', borderRadius: '999px', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Plus Jakarta Sans, sans-serif'}}
+              >
+                {chip}
+              </button>
             ))}
           </div>
+        </div>
+        
+        <div style={{position: 'relative', height: '580px'}}>
+          {[
+            {name:'Hyderabadi Dum Biryani',rest:'Paradise Restaurant',score:'9.4',emoji:'🍛',top:'30px',left:'20px',right:'auto',bottom:'auto'},
+            {name:'Masala Dosa',rest:'MTR · Bengaluru',score:'9.6',emoji:'🫓',bottom:'60px',right:'0px',top:'auto',left:'auto'},
+            {name:'Vada Pav',rest:"Ashok's · Mumbai",score:'9.1',emoji:'🍢',top:'0px',right:'30px',left:'auto',bottom:'auto'},
+          ].map(dish => (
+            <div key={dish.name} style={{position:'absolute',top:dish.top,left:dish.left,right:dish.right,bottom:dish.bottom,background:'white',border:'1px solid rgba(107,66,38,0.15)',borderRadius:'10px',boxShadow:'0 20px 60px rgba(107,66,38,0.12)',padding:'16px',width:'210px',zIndex:2}}>
+              <div style={{fontSize:'40px',marginBottom:'10px'}}>{dish.emoji}</div>
+              <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'16px',fontWeight:'700',color:'#1E1208',marginBottom:'4px'}}>{dish.name}</div>
+              <div style={{fontSize:'11px',color:'#A08060',marginBottom:'10px'}}>{dish.rest}</div>
+              <div style={{display:'inline-flex',alignItems:'center',gap:'4px',background:'#C8702A',color:'white',fontSize:'12px',fontWeight:'700',padding:'4px 10px',borderRadius:'3px'}}>★ {dish.score}</div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* MARQUEE */}
-      <div className="border-t border-b border-[rgba(107,66,38,0.12)] bg-[#F0E6CE] py-3 overflow-hidden">
-        <div className="flex whitespace-nowrap animate-marquee">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex items-center gap-0 flex-shrink-0">
-              {['4.2 Lakh Dishes Reviewed','47 Indian Cities','18,000+ Restaurants','Dish-Level Search \u2014 Only on DishCritic','2.1 Lakh Verified Reviewers'].map(item => (
-                <span key={item} className="inline-flex items-center gap-3 px-8 text-xs font-bold tracking-widest uppercase text-[#A08060]">
-                  <span className="w-1 h-1 bg-[#C8702A] rounded-full flex-shrink-0"></span>
+      <div style={{borderTop:'1px solid rgba(107,66,38,0.12)',borderBottom:'1px solid rgba(107,66,38,0.12)',background:'#F0E6CE',padding:'14px 0',overflow:'hidden',whiteSpace:'nowrap'}}>
+        <div style={{display:'inline-flex',animation:'marquee 25s linear infinite'}}>
+          {[...Array(2)].map((_,i) => (
+            <div key={i} style={{display:'inline-flex',alignItems:'center',gap:0,flexShrink:0}}>
+              {['4.2 Lakh Dishes Reviewed','47 Indian Cities','18,000+ Restaurants','Dish-Level Search — Only on DishCritic','2.1 Lakh Verified Reviewers'].map(item => (
+                <span key={item} style={{display:'inline-flex',alignItems:'center',gap:'12px',padding:'0 32px',fontSize:'12px',fontWeight:'700',letterSpacing:'0.06em',textTransform:'uppercase',color:'#A08060',fontFamily:'Plus Jakarta Sans, sans-serif'}}>
+                  <span style={{width:'4px',height:'4px',background:'#C8702A',borderRadius:'50%',flexShrink:0,opacity:0.5}}></span>
                   {item}
                 </span>
               ))}
@@ -123,68 +100,86 @@ export default function HomePage() {
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-4 border-t border-b border-[rgba(107,66,38,0.12)]">
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)'}}>
         {[
-          { num: formatCount(stats.dishes), label: 'Dishes Reviewed' },
-          { num: formatCount(stats.cities), label: 'Indian Cities' },
-          { num: formatCount(stats.restaurants), label: 'Restaurants' },
-          { num: formatCount(stats.dishes), label: 'Verified Reviewers' },
-        ].map((s, i) => (
-          <div key={s.label} className={`p-12 ${i < 3 ? 'border-r border-[rgba(107,66,38,0.12)]' : ''} hover:bg-[#F5EDD9] transition-colors`}>
-            <div className="font-serif text-5xl font-bold text-[#1E1208] mb-2">{s.num}</div>
-            <div className="text-xs font-bold tracking-widest uppercase text-[#A08060]">{s.label}</div>
+          {num:'4.2L',label:'Dishes Reviewed',desc:'Across all cuisines'},
+          {num:'47+',label:'Indian Cities',desc:'From metros to tier-2'},
+          {num:'50+',label:'Restaurants',desc:'In Hyderabad alone'},
+          {num:'Real',label:'Verified Reviews',desc:'By actual visitors'},
+        ].map((s,i) => (
+          <div key={s.label} style={{padding:'52px 48px',borderRight: i<3 ? '1px solid rgba(107,66,38,0.12)' : 'none',borderBottom:'1px solid rgba(107,66,38,0.12)',transition:'background 0.2s',cursor:'default'}}
+            onMouseOver={e => e.currentTarget.style.background='#F5EDD9'}
+            onMouseOut={e => e.currentTarget.style.background='transparent'}
+          >
+            <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'54px',fontWeight:'700',color:'#1E1208',letterSpacing:'-2px',lineHeight:1,marginBottom:'10px'}}>{s.num}</div>
+            <div style={{fontSize:'12px',fontWeight:'700',letterSpacing:'0.06em',textTransform:'uppercase',color:'#A08060',marginBottom:'6px'}}>{s.label}</div>
+            <div style={{fontSize:'13px',fontWeight:'300',color:'#C4A882'}}>{s.desc}</div>
           </div>
         ))}
       </div>
 
       {/* LEADERBOARD */}
-      <section className="bg-[#F5EDD9] px-14 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
-            <span className="w-6 h-px bg-[#C8702A]"></span>
+      <section style={{background:'#F5EDD9',padding:'100px 56px'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px',fontWeight:'700',letterSpacing:'0.14em',textTransform:'uppercase',color:'#C8702A',marginBottom:'18px'}}>
+            <span style={{width:'24px',height:'1.5px',background:'#C8702A'}}></span>
             This week · Hyderabad
           </div>
-          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
-            Best <em className="text-[#C8702A]">Biryani</em> in the City
-          </h2>
-          <div className="grid grid-cols-3 gap-5">
-            <div className="col-span-2 bg-white rounded-xl border border-[rgba(107,66,38,0.12)] overflow-hidden">
+          <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'48px'}}>
+            <h2 style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'clamp(34px,4vw,60px)',fontWeight:'300',letterSpacing:'-1px',lineHeight:'1.0',color:'#1E1208'}}>
+              Best <em style={{fontStyle:'italic',color:'#C8702A'}}>Biryani</em> in the City
+            </h2>
+            <Link href="/leaderboards" style={{fontSize:'12px',fontWeight:'600',letterSpacing:'0.07em',textTransform:'uppercase',color:'#9A6240',textDecoration:'none',borderBottom:'1px solid rgba(107,66,38,0.2)',paddingBottom:'3px'}}>
+              Full leaderboard →
+            </Link>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 360px',gap:'20px',alignItems:'start'}}>
+            <div style={{background:'white',border:'1px solid rgba(107,66,38,0.12)',borderRadius:'8px',overflow:'hidden'}}>
               {[
-                { rank: '01', name: 'Hyderabadi Dum Biryani', rest: 'Paradise Restaurant · Secunderabad', score: '9.4', reviews: '3,241' },
-                { rank: '02', name: 'Mutton Dum Biryani', rest: 'Shah Ghouse Café · Old City', score: '9.2', reviews: '2,108' },
-                { rank: '03', name: 'Chicken Dum Biryani', rest: 'Bawarchi · RTC Cross Roads', score: '9.0', reviews: '1,876' },
-                { rank: '04', name: 'Kacchi Gosht Biryani', rest: 'Café Bahar · Basheerbagh', score: '8.9', reviews: '1,543' },
-                { rank: '05', name: 'Veg Dum Biryani', rest: 'Honest Restaurant · Jubilee Hills', score: '8.7', reviews: '980' },
-              ].map((item, i) => (
-                <div key={item.rank} className={`grid grid-cols-[64px_80px_1fr_auto] items-center p-5 hover:bg-[#FDF0E4] cursor-pointer transition-colors ${i < 4 ? 'border-b border-[rgba(107,66,38,0.08)]' : ''}`}>
-                  <span className="font-serif text-4xl font-bold text-[rgba(107,66,38,0.15)]">{item.rank}</span>
-                  <span className="text-4xl text-center">🍛</span>
-                  <div className="px-4">
-                    <div className="font-serif text-lg font-semibold text-[#1E1208]">{item.name}</div>
-                    <div className="text-xs text-[#A08060]">{item.rest}</div>
+                {rank:'01',name:'Hyderabadi Dum Biryani',rest:'Paradise Restaurant · Secunderabad',score:'9.4',reviews:'3,241'},
+                {rank:'02',name:'Mutton Dum Biryani',rest:'Shah Ghouse Cafe · Old City',score:'9.2',reviews:'2,108'},
+                {rank:'03',name:'Chicken Dum Biryani',rest:'Bawarchi · RTC Cross Roads',score:'9.0',reviews:'1,876'},
+                {rank:'04',name:'Kacchi Gosht Biryani',rest:'Cafe Bahar · Basheerbagh',score:'8.9',reviews:'1,543'},
+                {rank:'05',name:'Veg Dum Biryani',rest:'Chutneys · Banjara Hills',score:'8.7',reviews:'980'},
+              ].map((item,i) => (
+                <div key={item.rank} style={{display:'grid',gridTemplateColumns:'64px 72px 1fr auto',alignItems:'center',padding:'18px 24px 18px 0',borderBottom: i<4 ? '1px solid rgba(107,66,38,0.08)' : 'none',cursor:'pointer',transition:'background 0.2s'}}
+                  onMouseOver={e => e.currentTarget.style.background='#FDF0E4'}
+                  onMouseOut={e => e.currentTarget.style.background='transparent'}
+                >
+                  <span style={{textAlign:'center',fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'13px',fontWeight:'600',color:'rgba(107,66,38,0.4)',letterSpacing:'0.04em'}}>{item.rank}</span>
+                  <span style={{fontSize:'36px',textAlign:'center'}}>🍛</span>
+                  <div style={{padding:'0 16px'}}>
+                    <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'19px',fontWeight:'600',color:'#1E1208',letterSpacing:'-0.2px',marginBottom:'3px'}}>{item.name}</div>
+                    <div style={{fontSize:'12px',color:'#A08060'}}>{item.rest}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-serif text-2xl font-bold text-[#C8702A]">{item.score}</div>
-                    <div className="text-xs text-[#A08060]">{item.reviews} reviews</div>
+                  <div style={{textAlign:'right',paddingRight:'4px'}}>
+                    <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'28px',fontWeight:'700',color:'#C8702A',letterSpacing:'-0.5px'}}>{item.score}</div>
+                    <div style={{fontSize:'11px',color:'#C4A882',marginTop:'1px'}}>{item.reviews} reviews</div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="bg-[#1E1208] rounded-xl overflow-hidden">
-              <div className="h-44 flex items-center justify-center text-8xl bg-gradient-to-br from-[#3D2008] to-[#6B3010]">🍛</div>
-              <div className="p-6">
-                <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-2">🏆 Best Biryani · Hyderabad</div>
-                <div className="font-serif text-2xl font-bold text-white mb-1">Hyderabadi Dum Biryani</div>
-                <div className="text-sm text-white/40 mb-6">Paradise Restaurant · Secunderabad</div>
-                <div className="grid grid-cols-2 gap-3 mb-5">
+            <div style={{background:'#1E1208',borderRadius:'8px',overflow:'hidden',position:'sticky',top:'96px'}}>
+              <div style={{width:'100%',height:'240px',background:'linear-gradient(140deg, #5A2408, #C05018, #7A3010)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'86px',position:'relative'}}>
+                <span style={{position:'absolute',top:'16px',left:'16px',background:'#C8702A',color:'white',fontSize:'10px',fontWeight:'700',letterSpacing:'0.1em',textTransform:'uppercase',padding:'5px 12px',borderRadius:'2px',zIndex:2}}>🏆 #1 This Week</span>
+                🍛
+              </div>
+              <div style={{padding:'24px 28px'}}>
+                <div style={{fontSize:'11px',fontWeight:'600',letterSpacing:'0.08em',textTransform:'uppercase',color:'#C8702A',marginBottom:'8px'}}>Best Biryani · Hyderabad</div>
+                <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'26px',fontWeight:'700',color:'white',letterSpacing:'-0.3px',marginBottom:'6px'}}>Hyderabadi Dum Biryani</div>
+                <div style={{fontSize:'13px',color:'rgba(255,255,255,0.4)',marginBottom:'22px'}}>Paradise Restaurant · Secunderabad</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginBottom:'18px'}}>
                   {[['9.4/10','Dish score'],['3.2K','Reviews'],['₹450','Per portion'],['4 yrs','In top 3']].map(([n,l]) => (
-                    <div key={l} className="bg-white/5 rounded-lg p-3">
-                      <div className="font-serif text-xl font-bold text-[#C8702A]">{n}</div>
-                      <div className="text-xs text-white/30">{l}</div>
+                    <div key={l} style={{background:'rgba(255,255,255,0.05)',borderRadius:'5px',padding:'12px 14px'}}>
+                      <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'22px',fontWeight:'700',color:'#C8702A',display:'block'}}>{n}</div>
+                      <div style={{fontSize:'11px',color:'rgba(255,255,255,0.3)',marginTop:'2px'}}>{l}</div>
                     </div>
                   ))}
                 </div>
-                <button className="w-full bg-[#C8702A] text-white py-3 rounded-lg text-sm font-bold tracking-wider uppercase hover:bg-[#E08030] transition-colors">
+                <button onClick={() => router.push('/dish/hyderabadi-dum-biryani')} style={{display:'block',width:'100%',padding:'13px',background:'#C8702A',color:'white',border:'none',borderRadius:'4px',cursor:'pointer',fontFamily:'Plus Jakarta Sans, sans-serif',fontSize:'12px',fontWeight:'700',letterSpacing:'0.08em',textTransform:'uppercase',transition:'background 0.2s'}}
+                  onMouseOver={e => e.currentTarget.style.background='#E08030'}
+                  onMouseOut={e => e.currentTarget.style.background='#C8702A'}
+                >
                   View Full Dish Page →
                 </button>
               </div>
@@ -194,138 +189,43 @@ export default function HomePage() {
       </section>
 
       {/* TRENDING */}
-      <section className="px-14 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
-            <span className="w-6 h-px bg-[#C8702A]"></span>
+      <section style={{padding:'100px 56px',background:'#FBF6EE'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px',fontWeight:'700',letterSpacing:'0.14em',textTransform:'uppercase',color:'#C8702A',marginBottom:'18px'}}>
+            <span style={{width:'24px',height:'1.5px',background:'#C8702A'}}></span>
             Blowing up right now
           </div>
-          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
-            Trending Dishes <em className="text-[#C8702A]">This Week</em>
-          </h2>
-          <div className="grid grid-cols-4 gap-5">
-            {topDishes.slice(0, 4).map((dish, idx) => {
-              const gradients = [
-                'linear-gradient(135deg, #EDE0C4, #D4B878)',
-                'linear-gradient(135deg, #F0D9C0, #C8906A)',
-                'linear-gradient(135deg, #E8D5B0, #B89050)',
-                'linear-gradient(135deg, #F5E8D0, #D4A060)',
-              ]
-              const badges = ['🔥 Viral', '📈 Rising', '🥇 Top Rated', '⭐ New Entry']
-              const restName = (dish as any).restaurants?.name || 'Restaurant'
-              const restCity = (dish as any).restaurants?.cities?.name || ''
-              const tags = [dish.is_veg ? 'Veg' : 'Non-Veg']
-              return (
-                <div key={dish.id} className="group relative bg-white border border-[rgba(107,66,38,0.12)] rounded-xl overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-500 cursor-pointer" onClick={() => router.push(`/dish/${dish.id}`)}>
-                  <div className="w-full h-44 flex items-center justify-center text-6xl relative overflow-hidden" style={{background: gradients[idx % gradients.length]}}>
-                    <span className="relative z-10 group-hover:scale-110 transition-transform duration-500">{dish.is_veg ? '🥗' : '🍛'}</span>
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8702A] text-white">{badges[idx % badges.length]}</span>
-                    </div>
-                  </div>
-                  <div className="p-5 space-y-3">
-                    <div>
-                      <h3 className="font-serif text-lg font-bold text-[#1E1208] group-hover:text-[#C8702A] transition-colors">{dish.name}</h3>
-                      <p className="text-xs text-[#A08060] mt-0.5">{restName}{restCity ? ` · ${restCity}` : ''}</p>
-                    </div>
-                    <div className="flex gap-1.5">
-                      {tags.map((tag) => (
-                        <span key={tag} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                          tag === 'Veg' ? 'bg-green-100 text-green-700' :
-                          tag === 'Non-Veg' ? 'bg-red-100 text-red-700' :
-                          'bg-[#F5EDD9] text-[#9A6240]'
-                        }`}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-[rgba(107,66,38,0.08)]">
-                      <div className="flex items-center gap-1">
-                        <span className="text-[#C8702A] font-bold font-sans text-base">{dish.score.toFixed(1)}</span>
-                        <span className="text-xs text-[#A08060]">/10</span>
-                      </div>
-                      <span className="text-xs text-[#A08060]">★ {dish.review_count >= 1000 ? (dish.review_count / 1000).toFixed(1) + 'K' : dish.review_count} reviews</span>
-                    </div>
-                  </div>
+          <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'48px'}}>
+            <h2 style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'clamp(34px,4vw,60px)',fontWeight:'300',letterSpacing:'-1px',color:'#1E1208'}}>
+              Trending <em style={{fontStyle:'italic',color:'#C8702A'}}>Dishes</em> This Week
+            </h2>
+            <Link href="/leaderboards" style={{fontSize:'12px',fontWeight:'600',letterSpacing:'0.07em',textTransform:'uppercase',color:'#9A6240',textDecoration:'none',borderBottom:'1px solid rgba(107,66,38,0.2)',paddingBottom:'3px'}}>See all →</Link>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'16px'}}>
+            {[
+              {name:'Masala Dosa',city:'MTR · Bengaluru',score:'9.6',emoji:'🫓',badge:'🔥 Viral',bg:'linear-gradient(140deg,#EDE0C4,#D4B878)',tags:['Veg','South Indian','Breakfast']},
+              {name:'Dal Makhani',city:'Bukhara · Delhi',score:'9.3',emoji:'🥘',badge:'📈 Rising',bg:'linear-gradient(140deg,#F0D9C0,#C8906A)',tags:['Veg','North Indian','Dinner']},
+              {name:'Irani Chai',city:'Nimrah Cafe · Hyderabad',score:'9.5',emoji:'☕',badge:'🔥 Viral',bg:'linear-gradient(140deg,#E8D5B0,#B89050)',tags:['Veg','Beverages','Breakfast']},
+              {name:'Papdi Chaat',city:'Gokul Chat · Hyderabad',score:'9.3',emoji:'🍢',badge:'⭐ New',bg:'linear-gradient(140deg,#F5E8D0,#D4A060)',tags:['Veg','Street Food','Snack']},
+            ].map(dish => (
+              <div key={dish.name} style={{background:'white',border:'1px solid rgba(107,66,38,0.12)',borderRadius:'8px',overflow:'hidden',cursor:'pointer',transition:'all 0.3s'}}
+                onMouseOver={e => {e.currentTarget.style.transform='translateY(-7px)';e.currentTarget.style.boxShadow='0 28px 70px rgba(107,66,38,0.13)'}}
+                onMouseOut={e => {e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}
+              >
+                <div style={{width:'100%',height:'188px',background:dish.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'60px',position:'relative'}}>
+                  <span style={{position:'absolute',top:'12px',left:'12px',fontSize:'10px',fontWeight:'700',letterSpacing:'0.05em',textTransform:'uppercase',padding:'4px 10px',borderRadius:'999px',background:'rgba(192,57,43,0.9)',color:'white',zIndex:1}}>{dish.badge}</span>
+                  {dish.emoji}
                 </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="bg-white px-14 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
-            <span className="w-6 h-px bg-[#C8702A]"></span>
-            Simple process
-          </div>
-          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
-            How It <em className="text-[#C8702A]">Works</em>
-          </h2>
-          <div className="grid grid-cols-3 gap-px bg-[rgba(107,66,38,0.08)] rounded-2xl overflow-hidden border border-[rgba(107,66,38,0.08)]">
-            {[
-              { number: '01', emoji: '🔍', title: 'Search any dish', desc: 'Type the dish you\'re craving — get it ranked across every restaurant in your city.' },
-              { number: '02', emoji: '⭐', title: 'Read dish-level reviews', desc: 'Every review is for a specific dish, not just the restaurant. Compare scores from real visitors.' },
-              { number: '03', emoji: '✍️', title: 'Share your review', desc: 'Rate each dish, upload a photo. Done in 60 seconds. Help thousands find their next great meal.' },
-            ].map((step) => (
-              <div key={step.number} className="relative bg-white p-10 hover:bg-[#FBF6EE] transition-colors duration-500 group">
-                <div className="absolute top-0 left-0 font-serif text-8xl font-bold text-[#F0E6CE] leading-none select-none pointer-events-none">{step.number}</div>
-                <div className="text-4xl mb-5 relative z-10">{step.emoji}</div>
-                <h3 className="font-serif text-xl font-bold text-[#1E1208] mb-3 relative z-10">{step.title}</h3>
-                <p className="text-sm text-[#A08060] leading-relaxed relative z-10">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* REVIEWS */}
-      <section className="bg-[#F0E6CE] px-14 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-xs font-bold tracking-widest uppercase text-[#C8702A] mb-4 flex items-center gap-2">
-            <span className="w-6 h-px bg-[#C8702A]"></span>
-            Community voices
-          </div>
-          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
-            What Foodies <em className="text-[#C8702A]">Are Saying</em>
-          </h2>
-          <div className="grid grid-cols-3 gap-6">
-            {[
-              {
-                name: 'Arjun Mehta', title: 'Biryani Expert', initials: 'AM',
-                quote: 'The rice is perfectly cooked — each grain separate, every one soaked in saffron. No biryani in this city even comes close.',
-                dish: 'Hyderabadi Dum Biryani', stars: 5,
-              },
-              {
-                name: 'Priya Nair', title: 'South Indian Expert', initials: 'PN',
-                quote: 'MTR\'s batter has that perfect overnight fermented sourness you simply cannot replicate at home. A benchmark for all dosas.',
-                dish: 'Masala Dosa · MTR', stars: 5,
-              },
-              {
-                name: 'Rahul Singh', title: 'Street Food Fanatic', initials: 'RS',
-                quote: 'I\'ve had this 40+ times and it never changes. The dry chutney ratio is perfect. That consistency is the mark of a true legend.',
-                dish: 'Vada Pav · Ashok\'s', stars: 5,
-              },
-            ].map((review) => (
-              <div key={review.name} className="group relative bg-white rounded-2xl border border-[rgba(107,66,38,0.12)] p-8 hover:shadow-lg transition-all duration-500 overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#C8702A] to-[#E08030] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                <span className="font-serif text-6xl font-bold text-[#F0E6CE] leading-none block mb-2">&ldquo;</span>
-                <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F0E6CE] text-[#9A6240] mb-4">{review.dish}</span>
-                <p className="font-serif italic text-base text-[#1E1208] leading-relaxed mb-6">&ldquo;{review.quote}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-[rgba(107,66,38,0.08)]">
-                  <div className="w-10 h-10 rounded-full bg-[#C8702A]/10 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-[#C8702A]">{review.initials}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#1E1208] truncate">{review.name}</p>
-                    <p className="text-xs text-[#A08060]">{review.title}</p>
-                  </div>
-                  <div className="flex gap-0.5 shrink-0">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} className={`text-sm ${i < review.stars ? 'text-[#C8702A]' : 'text-[rgba(107,66,38,0.15)]'}`}>★</span>
+                <div style={{padding:'16px 18px 20px'}}>
+                  <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'18px',fontWeight:'600',color:'#1E1208',letterSpacing:'-0.2px',marginBottom:'3px'}}>{dish.name}</div>
+                  <div style={{fontSize:'11px',color:'#A08060',marginBottom:'12px'}}>{dish.city}</div>
+                  <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'12px'}}>
+                    {dish.tags.map(tag => (
+                      <span key={tag} style={{fontSize:'10px',fontWeight:'500',color:'#9A6240',background:'#F5EDD9',border:'1px solid rgba(107,66,38,0.12)',borderRadius:'2px',padding:'3px 8px'}}>{tag}</span>
                     ))}
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                    <span style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'22px',fontWeight:'700',color:'#C8702A'}}>★ {dish.score}</span>
                   </div>
                 </div>
               </div>
@@ -335,43 +235,140 @@ export default function HomePage() {
       </section>
 
       {/* CITIES */}
-      <section className="bg-[#F0E6CE] px-14 py-20">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="font-serif text-5xl font-light text-[#1E1208] mb-12">
-            Pick Your <em className="text-[#C8702A]">City</em>
+      <section style={{padding:'100px 56px',background:'#F0E6CE'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'48px'}}>
+            <h2 style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'clamp(34px,4vw,60px)',fontWeight:'300',letterSpacing:'-1px',color:'#1E1208'}}>
+              Pick Your <em style={{fontStyle:'italic',color:'#C8702A'}}>City</em>
+            </h2>
+            <Link href="/cities" style={{fontSize:'12px',fontWeight:'600',letterSpacing:'0.07em',textTransform:'uppercase',color:'#9A6240',textDecoration:'none',borderBottom:'1px solid rgba(107,66,38,0.2)',paddingBottom:'3px'}}>All 10 cities →</Link>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:'14px'}}>
+            {[
+              {emoji:'🕌',name:'Hyderabad',count:'50+',state:'Telangana'},
+              {emoji:'🌆',name:'Mumbai',count:'3,240',state:'Maharashtra'},
+              {emoji:'🌿',name:'Bengaluru',count:'2,640',state:'Karnataka'},
+              {emoji:'🏛️',name:'Delhi',count:'4,100',state:'Delhi'},
+              {emoji:'🐟',name:'Chennai',count:'1,980',state:'Tamil Nadu'},
+              {emoji:'🎨',name:'Kolkata',count:'1,720',state:'West Bengal'},
+            ].map(city => (
+              <Link key={city.name} href={`/cities/${city.name.toLowerCase()}`} style={{background:'white',border:'1px solid rgba(107,66,38,0.12)',borderRadius:'8px',padding:'28px 16px 24px',textAlign:'center',cursor:'pointer',transition:'all 0.3s',textDecoration:'none',display:'block',position:'relative',overflow:'hidden'}}
+                onMouseOver={e => {e.currentTarget.style.borderColor='rgba(200,112,42,0.3)';e.currentTarget.style.transform='translateY(-5px)';e.currentTarget.style.boxShadow='0 16px 48px rgba(107,66,38,0.1)'}}
+                onMouseOut={e => {e.currentTarget.style.borderColor='rgba(107,66,38,0.12)';e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}
+              >
+                <div style={{fontSize:'30px',display:'block',marginBottom:'12px'}}>{city.emoji}</div>
+                <div style={{fontSize:'13px',fontWeight:'700',letterSpacing:'0.05em',textTransform:'uppercase',color:'#1E1208',marginBottom:'4px'}}>{city.name}</div>
+                <div style={{fontSize:'11px',color:'#A08060',marginBottom:'6px'}}>restaurants</div>
+                <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'18px',fontWeight:'700',color:'#C8702A'}}>{city.count}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section style={{padding:'100px 56px',background:'white'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px',fontWeight:'700',letterSpacing:'0.14em',textTransform:'uppercase',color:'#C8702A',marginBottom:'18px'}}>
+            <span style={{width:'24px',height:'1.5px',background:'#C8702A'}}></span>
+            Simple process
+          </div>
+          <h2 style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'clamp(34px,4vw,60px)',fontWeight:'300',letterSpacing:'-1px',color:'#1E1208',marginBottom:'60px'}}>
+            Your <em style={{fontStyle:'italic',color:'#C8702A'}}>perfect dish</em> in three steps
           </h2>
-          <div className="grid grid-cols-6 gap-3">
-            {cities.slice(0, 6).map(city => (
-              <a key={city.name} href={`/cities/${city.name.toLowerCase()}`} className="bg-white border border-[rgba(107,66,38,0.12)] rounded-xl p-6 text-center hover:border-[#C8702A] hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
-                <div className="text-3xl mb-2">{city.emoji || '🏙️'}</div>
-                <div className="text-xs font-bold tracking-wider uppercase text-[#1E1208] mb-0.5">{city.name}</div>
-                <div className="text-xs text-[#A08060] mb-1">restaurants</div>
-                <div className="font-serif text-3xl font-bold text-[#C8702A]">{city.restaurant_count || 0}</div>
-              </a>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1px',background:'rgba(107,66,38,0.12)',border:'1px solid rgba(107,66,38,0.12)',borderRadius:'10px',overflow:'hidden'}}>
+            {[
+              {num:'01',icon:'🔍',title:'Search any dish',desc:'Type the dish you are craving — get it ranked across every restaurant in your city. Biryani, Masala Dosa, Butter Chicken — we have them all.'},
+              {num:'02',icon:'⭐',title:'Read dish-level reviews',desc:'Every review is for a specific dish, not just the restaurant. Compare scores, read honest notes from real visitors.'},
+              {num:'03',icon:'✍️',title:'Share your review',desc:'Rate each dish, upload a photo. Done in 60 seconds. Help thousands of food lovers find their next great meal.'},
+            ].map(step => (
+              <div key={step.num} style={{background:'white',padding:'52px 44px',transition:'background 0.25s',cursor:'default',position:'relative'}}
+                onMouseOver={e => e.currentTarget.style.background='#FBF6EE'}
+                onMouseOut={e => e.currentTarget.style.background='white'}
+              >
+                <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'80px',fontWeight:'700',color:'#F0E6CE',lineHeight:'1',marginBottom:'20px'}}>{step.num}</div>
+                <div style={{fontSize:'36px',marginBottom:'18px'}}>{step.icon}</div>
+                <div style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'24px',fontWeight:'600',color:'#1E1208',letterSpacing:'-0.3px',marginBottom:'12px'}}>{step.title}</div>
+                <p style={{fontSize:'14px',fontWeight:'300',lineHeight:'1.85',color:'#A08060'}}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* REVIEWS */}
+      <section style={{padding:'100px 56px',background:'#F0E6CE'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px',fontWeight:'700',letterSpacing:'0.14em',textTransform:'uppercase',color:'#C8702A',marginBottom:'18px'}}>
+            <span style={{width:'24px',height:'1.5px',background:'#C8702A'}}></span>
+            Community voices
+          </div>
+          <h2 style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'clamp(34px,4vw,60px)',fontWeight:'300',letterSpacing:'-1px',color:'#1E1208',marginBottom:'48px'}}>
+            What Foodies Are <em style={{fontStyle:'italic',color:'#C8702A'}}>Saying</em>
+          </h2>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px'}}>
+            {[
+              {q:'Arjun Mehta',badge:'🍛 Biryani Expert · 142 reviews',dish:'🍛 Hyderabadi Dum Biryani',text:'The rice is perfectly cooked — each grain separate, every one soaked in saffron. No biryani in this city even comes close. I have been coming here for 8 years.',av:'A',avBg:'rgba(200,112,42,0.12)',avColor:'#C8702A'},
+              {q:'Priya Nair',badge:'🫓 South Indian Expert · 89 reviews',dish:'🫓 Masala Dosa · MTR',text:'MTR&apos;s batter has that perfect overnight fermented sourness you simply cannot replicate at home. The potato filling is never greasy. A benchmark for all dosas.',av:'P',avBg:'rgba(46,125,50,0.1)',avColor:'#2E7D32'},
+              {q:'Rahul Singh',badge:'🍢 Street Food Fanatic · 201 reviews',dish:'☕ Irani Chai · Nimrah Cafe',text:'I have had this 40+ times and it never changes. The Irani chai here is perfectly strong, perfectly sweet. That consistency is the mark of a true Hyderabad legend.',av:'R',avBg:'rgba(192,57,43,0.1)',avColor:'#E57373'},
+            ].map(rev => (
+              <div key={rev.q} style={{background:'white',border:'1px solid rgba(107,66,38,0.12)',borderRadius:'8px',padding:'32px',cursor:'default',transition:'all 0.3s',position:'relative',overflow:'hidden'}}
+                onMouseOver={e => {e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 24px 60px rgba(107,66,38,0.1)'}}
+                onMouseOut={e => {e.currentTarget.style.transform='none';e.currentTarget.style.boxShadow='none'}}
+              >
+                <span style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'60px',fontWeight:'700',color:'#F0E6CE',lineHeight:'0.6',display:'block',marginBottom:'12px'}}>&ldquo;</span>
+                <div style={{display:'inline-flex',alignItems:'center',gap:'6px',background:'#FDF0E4',border:'1px solid rgba(200,112,42,0.2)',color:'#C8702A',fontSize:'11px',fontWeight:'600',letterSpacing:'0.04em',padding:'5px 12px',borderRadius:'999px',marginBottom:'16px'}}>{rev.dish}</div>
+                <p style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'16px',fontWeight:'400',fontStyle:'italic',lineHeight:'1.75',color:'#2E1E10',marginBottom:'26px'}}>{rev.text}</p>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                    <div style={{width:'38px',height:'38px',borderRadius:'50%',background:rev.avBg,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'16px',fontWeight:'700',color:rev.avColor,flexShrink:0}}>{rev.av}</div>
+                    <div>
+                      <div style={{fontSize:'13px',fontWeight:'600',color:'#1E1208'}}>{rev.q}</div>
+                      <div style={{fontSize:'11px',color:'#A08060',marginTop:'1px'}}>{rev.badge}</div>
+                    </div>
+                  </div>
+                  <div style={{color:'#C8702A',fontSize:'13px',letterSpacing:'2px'}}>★★★★★</div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="bg-[#1E1208] px-14 py-28 text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-serif text-6xl font-light text-white mb-6 leading-tight">
+      <section style={{padding:'160px 56px',background:'#1E1208',textAlign:'center',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'relative',zIndex:2}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:'10px',fontSize:'11px',fontWeight:'700',letterSpacing:'0.14em',textTransform:'uppercase',color:'#C8702A',marginBottom:'24px',justifyContent:'center'}}>
+            <span style={{width:'24px',height:'1.5px',background:'#C8702A'}}></span>
+            Join food lovers across India
+          </div>
+          <h2 style={{fontFamily:'Cormorant Garamond, Georgia, serif',fontSize:'clamp(44px,6vw,84px)',fontWeight:'300',letterSpacing:'-2px',lineHeight:'1.0',color:'white',marginBottom:'24px'}}>
             Start Reviewing Your<br/>
-            Favourite <em className="text-[#C8702A]">Dishes Today</em>
+            Favourite <em style={{fontStyle:'italic',color:'#C8702A'}}>Dishes Today</em>
           </h2>
-          <p className="text-white/40 text-lg font-light mb-12">Free to join. Free forever.</p>
-          <div className="flex gap-4 justify-center">
-            <a href="/auth" className="bg-[#C8702A] text-white px-10 py-4 rounded-lg font-bold tracking-wider uppercase text-sm hover:bg-[#E08030] transition-colors">
-              Create Free Account →
-            </a>
-            <a href="/search" className="border border-white/20 text-white/60 px-10 py-4 rounded-lg font-semibold tracking-wider uppercase text-sm hover:border-white/40 hover:text-white transition-colors">
-              Browse as Guest
-            </a>
+          <p style={{fontSize:'17px',fontWeight:'300',color:'rgba(255,255,255,0.35)',lineHeight:'1.8',maxWidth:'460px',margin:'0 auto 56px'}}>
+            Your honest review of that one dish could change someone&apos;s meal — forever. Free to join. Free forever.
+          </p>
+          <div style={{display:'flex',gap:'16px',justifyContent:'center'}}>
+            <Link href="/auth" style={{background:'#C8702A',color:'white',border:'none',padding:'16px 40px',borderRadius:'3px',cursor:'pointer',fontFamily:'Plus Jakarta Sans, sans-serif',fontSize:'13px',fontWeight:'700',letterSpacing:'0.1em',textTransform:'uppercase',transition:'background 0.2s',textDecoration:'none',display:'inline-block'}}
+              onMouseOver={e => e.currentTarget.style.background='#E08030'}
+              onMouseOut={e => e.currentTarget.style.background='#C8702A'}
+            >Create Free Account →</Link>
+            <Link href="/search" style={{background:'transparent',color:'rgba(255,255,255,0.5)',border:'1px solid rgba(255,255,255,0.15)',padding:'16px 40px',borderRadius:'3px',cursor:'pointer',fontFamily:'Plus Jakarta Sans, sans-serif',fontSize:'13px',fontWeight:'600',letterSpacing:'0.08em',textTransform:'uppercase',transition:'all 0.2s',textDecoration:'none',display:'inline-block'}}
+              onMouseOver={e => {e.currentTarget.style.color='white';e.currentTarget.style.borderColor='rgba(255,255,255,0.35)'}}
+              onMouseOut={e => {e.currentTarget.style.color='rgba(255,255,255,0.5)';e.currentTarget.style.borderColor='rgba(255,255,255,0.15)'}}
+            >Browse as Guest</Link>
           </div>
         </div>
       </section>
 
-    </div>
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
+
+    </main>
   )
 }
