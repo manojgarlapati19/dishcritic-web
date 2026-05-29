@@ -77,6 +77,24 @@ export function Navbar() {
             ))}
           </nav>
 
+          {/* Navbar Search */}
+          <div className="hidden lg:flex items-center">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-brown-muted" />
+              <input
+                type="text"
+                placeholder="Search dishes..."
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
+                    router.push(`/search?q=${encodeURIComponent((e.target as HTMLInputElement).value.trim())}`)
+                    ;(e.target as HTMLInputElement).value = ''
+                  }
+                }}
+                className="w-44 pl-9 pr-3 py-1.5 bg-cream-dark border border-brown-muted/10 rounded-lg text-xs text-ink placeholder:text-brown-muted/50 focus:outline-none focus:ring-2 focus:ring-saffron/30 focus:border-saffron/50 focus:w-56 transition-all"
+              />
+            </div>
+          </div>
+
           {/* Right Side */}
           <div className="flex items-center gap-3">
             {isAuthenticated && user ? (

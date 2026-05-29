@@ -1,6 +1,41 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { getCities, getTopDishes, getPlatformStats } from '@/lib/queries'
+import type { City, Dish } from '@/types'
+
 export default function HomePage() {
+  const router = useRouter()
+  const [cities, setCities] = useState<City[]>([])
+  const [topDishes, setTopDishes] = useState<Dish[]>([])
+  const [stats, setStats] = useState({ dishes: 0, restaurants: 0, cities: 0 })
+  const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [citiesData, dishesData, statsData] = await Promise.all([
+          getCities(),
+          getTopDishes(8),
+          getPlatformStats(),
+        ])
+        setCities(citiesData || [])
+        setTopDishes(dishesData || [])
+        setStats(statsData)
+      } catch (err) {
+        console.error('Error loading homepage data:', err)
+      }
+    }
+    loadData()
+  }, [])
+
+  const formatCount = (n: number) => {
+    if (n >= 100000) return (n / 100000).toFixed(1) + 'L'
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
+    return String(n)
+  }
+
   return (
     <div className="min-h-screen bg-[#FBF6EE]">
       
@@ -18,25 +53,38 @@ export default function HomePage() {
               Not Just Restaurants
             </h1>
             <p className="text-[#A08060] text-lg font-light leading-relaxed max-w-md mb-10">
-              Search any dish. Get ranked results by that specific dish — not the overall restaurant. 4.2 lakh reviews across 47 Indian cities.
+              Search any dish. Get ranked results by that specific dish — not the overall restaurant. {stats.dishes.toLocaleString()} reviews across {stats.cities} Indian cities.
             </p>
             <div className="flex items-center bg-white border-2 border-[rgba(107,66,38,0.2)] rounded-lg overflow-hidden max-w-lg shadow-lg focus-within:border-[#C8702A]">
               <span className="px-4 text-[#A08060] text-lg">🔍</span>
               <input 
                 type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && router.push(`/search?q=${encodeURIComponent(searchQuery)}`)}
                 placeholder='Try "Hyderabadi Biryani", "Masala Dosa"...'
                 className="flex-1 py-4 px-2 bg-transparent outline-none text-[#1E1208] placeholder-[#C4A882]"
               />
-              <button className="bg-[#C8702A] text-white px-8 py-4 font-bold text-sm tracking-wider uppercase hover:bg-[#E08030] transition-colors">
+              <button 
+                onClick={() => router.push(`/search?q=${encodeURIComponent(searchQuery)}`)}
+                className="bg-[#C8702A] text-white px-8 py-4 font-bold text-sm tracking-wider uppercase hover:bg-[#E08030] transition-colors"
+              >
                 Search →
               </button>
             </div>
             <div className="flex flex-wrap gap-2 mt-4">
-              {['🍛 Biryani','🥘 Butter Chicken','🫓 Masala Dosa','🍢 Vada Pav','🫕 Chole Bhature'].map(chip => (
-                <span key={chip} className="text-xs text-[#9A6240] bg-[#F0E6CE] border border-[rgba(107,66,38,0.15)] px-3 py-2 rounded-full cursor-pointer hover:border-[#C8702A] hover:text-[#C8702A] transition-all">
-                  {chip}
-                </span>
-              ))}
+              {['🍛 Biryani','🥘 Butter Chicken','🫓 Masala Dosa','🍢 Vada Pav','🫕 Chole Bhature'].map(chip => {
+                const searchTerm = chip.replace(/^[^\s]*\s/, '')
+                return (
+                  <span 
+                    key={chip} 
+                    onClick={() => router.push(`/search?q=${encodeURIComponent(searchTerm)}`)}
+                    className="text-xs text-[#9A6240] bg-[#F0E6CE] border border-[rgba(107,66,38,0.15)] px-3 py-2 rounded-full cursor-pointer hover:border-[#C8702A] hover:text-[#C8702A] transition-all"
+                  >
+                    {chip}
+                  </span>
+                )
+              })}
             </div>
           </div>
           <div className="relative h-[500px]">
@@ -77,10 +125,10 @@ export default function HomePage() {
       {/* STATS */}
       <div className="grid grid-cols-4 border-t border-b border-[rgba(107,66,38,0.12)]">
         {[
-          { num: '4.2L', label: 'Dishes Reviewed' },
-          { num: '47+', label: 'Indian Cities' },
-          { num: '18K', label: 'Restaurants' },
-          { num: '2.1L', label: 'Verified Reviewers' },
+          { num: formatCount(stats.dishes), label: 'Dishes Reviewed' },
+          { num: formatCount(stats.cities), label: 'Indian Cities' },
+          { num: formatCount(stats.restaurants), label: 'Restaurants' },
+          { num: formatCount(stats.dishes), label: 'Verified Reviewers' },
         ].map((s, i) => (
           <div key={s.label} className={`p-12 ${i < 3 ? 'border-r border-[rgba(107,66,38,0.12)]' : ''} hover:bg-[#F5EDD9] transition-colors`}>
             <div className="font-serif text-5xl font-bold text-[#1E1208] mb-2">{s.num}</div>
@@ -156,45 +204,52 @@ export default function HomePage() {
             Trending Dishes <em className="text-[#C8702A]">This Week</em>
           </h2>
           <div className="grid grid-cols-4 gap-5">
-            {[
-              { emoji: '🫓', name: 'Masala Dosa', rest: 'MTR · Bengaluru', score: '9.6', badge: '🔥 Viral', tags: ['Veg','South Indian'], gradient: 'linear-gradient(135deg, #EDE0C4, #D4B878)' },
-              { emoji: '🥘', name: 'Dal Makhani', rest: 'Bukhara · Delhi', score: '9.3', badge: '📈 Rising', tags: ['Veg','North Indian'], gradient: 'linear-gradient(135deg, #F0D9C0, #C8906A)' },
-              { emoji: '🥣', name: 'Misal Pav', rest: 'Mamledar · Thane', score: '9.4', badge: '🔥 Viral', tags: ['Veg','Spicy'], gradient: 'linear-gradient(135deg, #E8D5B0, #B89050)' },
-              { emoji: '🍢', name: 'Vada Pav', rest: 'Ashok · Mumbai', score: '9.1', badge: '⭐ New Entry', tags: ['Veg','Street Food'], gradient: 'linear-gradient(135deg, #F5E8D0, #D4A060)' },
-            ].map((dish) => (
-              <div key={dish.name} className="group relative bg-white border border-[rgba(107,66,38,0.12)] rounded-xl overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-500 cursor-pointer">
-                <div className="w-full h-44 flex items-center justify-center text-6xl relative overflow-hidden" style={{background: dish.gradient}}>
-                  <span className="relative z-10 group-hover:scale-110 transition-transform duration-500">{dish.emoji}</span>
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8702A] text-white">{dish.badge}</span>
-                  </div>
-                </div>
-                <div className="p-5 space-y-3">
-                  <div>
-                    <h3 className="font-serif text-lg font-bold text-[#1E1208] group-hover:text-[#C8702A] transition-colors">{dish.name}</h3>
-                    <p className="text-xs text-[#A08060] mt-0.5">{dish.rest}</p>
-                  </div>
-                  <div className="flex gap-1.5">
-                    {dish.tags.map((tag) => (
-                      <span key={tag} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                        tag === 'Veg' ? 'bg-green-100 text-green-700' :
-                        tag === 'Non-Veg' ? 'bg-red-100 text-red-700' :
-                        'bg-[#F5EDD9] text-[#9A6240]'
-                      }`}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-[rgba(107,66,38,0.08)]">
-                    <div className="flex items-center gap-1">
-                      <span className="text-[#C8702A] font-bold font-sans text-base">{dish.score}</span>
-                      <span className="text-xs text-[#A08060]">/10</span>
+            {topDishes.slice(0, 4).map((dish, idx) => {
+              const gradients = [
+                'linear-gradient(135deg, #EDE0C4, #D4B878)',
+                'linear-gradient(135deg, #F0D9C0, #C8906A)',
+                'linear-gradient(135deg, #E8D5B0, #B89050)',
+                'linear-gradient(135deg, #F5E8D0, #D4A060)',
+              ]
+              const badges = ['🔥 Viral', '📈 Rising', '🥇 Top Rated', '⭐ New Entry']
+              const restName = (dish as any).restaurants?.name || 'Restaurant'
+              const restCity = (dish as any).restaurants?.cities?.name || ''
+              const tags = [dish.is_veg ? 'Veg' : 'Non-Veg']
+              return (
+                <div key={dish.id} className="group relative bg-white border border-[rgba(107,66,38,0.12)] rounded-xl overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-500 cursor-pointer" onClick={() => router.push(`/dish/${dish.id}`)}>
+                  <div className="w-full h-44 flex items-center justify-center text-6xl relative overflow-hidden" style={{background: gradients[idx % gradients.length]}}>
+                    <span className="relative z-10 group-hover:scale-110 transition-transform duration-500">{dish.is_veg ? '🥗' : '🍛'}</span>
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8702A] text-white">{badges[idx % badges.length]}</span>
                     </div>
-                    <span className="text-xs text-[#A08060]">★ 4.8K reviews</span>
+                  </div>
+                  <div className="p-5 space-y-3">
+                    <div>
+                      <h3 className="font-serif text-lg font-bold text-[#1E1208] group-hover:text-[#C8702A] transition-colors">{dish.name}</h3>
+                      <p className="text-xs text-[#A08060] mt-0.5">{restName}{restCity ? ` · ${restCity}` : ''}</p>
+                    </div>
+                    <div className="flex gap-1.5">
+                      {tags.map((tag) => (
+                        <span key={tag} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                          tag === 'Veg' ? 'bg-green-100 text-green-700' :
+                          tag === 'Non-Veg' ? 'bg-red-100 text-red-700' :
+                          'bg-[#F5EDD9] text-[#9A6240]'
+                        }`}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-[rgba(107,66,38,0.08)]">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[#C8702A] font-bold font-sans text-base">{dish.score.toFixed(1)}</span>
+                        <span className="text-xs text-[#A08060]">/10</span>
+                      </div>
+                      <span className="text-xs text-[#A08060]">★ {dish.review_count >= 1000 ? (dish.review_count / 1000).toFixed(1) + 'K' : dish.review_count} reviews</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -286,19 +341,12 @@ export default function HomePage() {
             Pick Your <em className="text-[#C8702A]">City</em>
           </h2>
           <div className="grid grid-cols-6 gap-3">
-            {[
-              { emoji: '🕌', name: 'Hyderabad', count: '2,810' },
-              { emoji: '🌆', name: 'Mumbai', count: '3,240' },
-              { emoji: '🌿', name: 'Bengaluru', count: '2,640' },
-              { emoji: '🏛️', name: 'Delhi', count: '4,100' },
-              { emoji: '🐟', name: 'Chennai', count: '1,980' },
-              { emoji: '🎨', name: 'Kolkata', count: '1,720' },
-            ].map(city => (
+            {cities.slice(0, 6).map(city => (
               <a key={city.name} href={`/cities/${city.name.toLowerCase()}`} className="bg-white border border-[rgba(107,66,38,0.12)] rounded-xl p-6 text-center hover:border-[#C8702A] hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
-                <div className="text-3xl mb-2">{city.emoji}</div>
+                <div className="text-3xl mb-2">{city.emoji || '🏙️'}</div>
                 <div className="text-xs font-bold tracking-wider uppercase text-[#1E1208] mb-0.5">{city.name}</div>
                 <div className="text-xs text-[#A08060] mb-1">restaurants</div>
-                <div className="font-serif text-3xl font-bold text-[#C8702A]">{city.count}</div>
+                <div className="font-serif text-3xl font-bold text-[#C8702A]">{city.restaurant_count || 0}</div>
               </a>
             ))}
           </div>

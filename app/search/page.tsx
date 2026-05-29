@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
   Search, X, MapPin, ChevronDown, Grid3X3, List, Star, IndianRupee,
   TrendingUp, UtensilsCrossed, RotateCcw, ArrowUpRight, SlidersHorizontal, Leaf, Beef
@@ -9,6 +9,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { searchDishes } from '@/lib/queries'
+import type { Dish } from '@/types'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -30,18 +32,27 @@ interface DishResult {
   snippet: string
 }
 
-// ─── Sample Data ─────────────────────────────────────────────────────────────
+// ─── Helper to convert Supabase dish to DishResult ────────────────────────────
 
-const SAMPLE_RESULTS: DishResult[] = [
-  { id: '1', dishName: 'Hyderabadi Dum Biryani', restaurantName: 'Paradise Restaurant', area: 'Banjara Hills', city: 'Hyderabad', score: 9.4, reviewCount: 4200, price: 450, tags: ['Non-Veg', 'Spicy'], isVeg: false, snippet: 'The gold standard of Hyderabadi biryani. Perfectly layered fragrant rice with tender marinated meat, cooked to perfection in a sealed handi.' },
-  { id: '2', dishName: 'Mutton Biryani', restaurantName: 'Shah Ghouse', area: 'Tolichowki', city: 'Hyderabad', score: 9.2, reviewCount: 3100, price: 420, tags: ['Non-Veg', 'Popular'], isVeg: false, snippet: 'Rich, aromatic mutton biryani with perfectly spiced meat that falls off the bone. A Hyderabad institution.' },
-  { id: '3', dishName: 'Chicken Biryani', restaurantName: 'Bawarchi', area: 'RTC X Roads', city: 'Hyderabad', score: 9.0, reviewCount: 2800, price: 380, tags: ['Non-Veg'], isVeg: false, snippet: 'The iconic chicken biryani that put Bawarchi on the map. Consistently delicious, always satisfying.' },
-  { id: '4', dishName: 'Kacchi Biryani', restaurantName: 'Cafe Bahar', area: 'Himayath Nagar', city: 'Hyderabad', score: 8.9, reviewCount: 1950, price: 480, tags: ['Non-Veg', 'Premium'], isVeg: false, snippet: 'Authentic kacchi (raw) biryani prepared with aged basmati and premium mutton. A true delicacy.' },
-  { id: '5', dishName: 'Veg Biryani', restaurantName: 'Honest Restaurant', area: 'Hitech City', city: 'Hyderabad', score: 8.7, reviewCount: 1700, price: 320, tags: ['Veg'], isVeg: true, snippet: 'The best veg biryani in town. Fragrant rice loaded with fresh vegetables and aromatic spices.' },
-  { id: '6', dishName: 'Chicken Dum Biryani', restaurantName: 'Paradise Restaurant', area: 'Secunderabad', city: 'Hyderabad', score: 8.5, reviewCount: 1500, price: 410, tags: ['Non-Veg'], isVeg: false, snippet: 'Classic chicken dum biryani with the signature Paradise touch. A must-try for biryani lovers.' },
-  { id: '7', dishName: 'Egg Biryani', restaurantName: 'Meridian Restaurant', area: 'Ameerpet', city: 'Hyderabad', score: 8.2, reviewCount: 950, price: 290, tags: ['Non-Veg', 'Budget'], isVeg: false, snippet: 'Creative egg biryani with perfectly spiced boiled eggs layered with aromatic biryani rice.' },
-  { id: '8', dishName: 'Mushroom Biryani', restaurantName: 'Kritunga', area: 'Miyapur', city: 'Hyderabad', score: 7.9, reviewCount: 720, price: 310, tags: ['Veg'], isVeg: true, snippet: 'Flavorful mushroom biryani that even non-vegetarians enjoy. Generous portions.' },
-]
+function dishToResult(dish: Dish): DishResult {
+  const restaurant = (dish as any).restaurants
+  const cityName = restaurant?.cities?.name || ''
+  const addressPieces = (restaurant?.address || '').split(',').map((s: string) => s.trim())
+  const area = addressPieces.length > 1 ? addressPieces[addressPieces.length - 2] : addressPieces[0] || ''
+  return {
+    id: dish.id,
+    dishName: dish.name,
+    restaurantName: restaurant?.name || 'Restaurant',
+    area,
+    city: cityName,
+    score: dish.score,
+    reviewCount: dish.review_count,
+    price: dish.price || 0,
+    tags: [dish.is_veg ? 'Veg' : 'Non-Veg'],
+    isVeg: dish.is_veg,
+    snippet: `${dish.score.toFixed(1)}/10 · ${dish.review_count} reviews`,
+  }
+}
 
 const CUISINE_TYPES = ['Hyderabadi', 'South Indian', 'North Indian', 'Street Food']
 const CITIES = ['Hyderabad', 'Mumbai', 'Bengaluru', 'Delhi', 'Chennai', 'Kolkata']
@@ -391,7 +402,8 @@ function RegularResultCard({ dish, viewMode }: { dish: DishResult; viewMode: Vie
 
 function SearchPageContent() {
   const searchParams = useSearchParams()
-  const query = searchParams.get('q') || 'Biryani'
+  const router = useRouter()
+  const query = searchParams.get('q') || ''
 
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [sortBy, setSortBy] = useState<SortOption>('score')
@@ -402,9 +414,31 @@ function SearchPageContent() {
   const [minScore, setMinScore] = useState<number | null>(null)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [searchText, setSearchText] = useState(query)
+  const [results, setResults] = useState<DishResult[]>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!query) {
+      setResults([])
+      return
+    }
+    setLoading(true)
+    searchDishes(query)
+      .then(data => {
+        setResults((data || []).map(dishToResult))
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [query])
 
   const sortLabel = SORT_OPTIONS.find((o) => o.value === sortBy)?.label || 'Best Rated'
-  const resultCount = SAMPLE_RESULTS.length
+  const resultCount = results.length
+
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchText.trim())}`)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-cream">
@@ -419,6 +453,7 @@ function SearchPageContent() {
                 type="text"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="Search any dish..."
                 className="w-full pl-10 pr-4 py-2.5 bg-cream-dark border border-brown-muted/10 rounded-xl text-sm text-ink placeholder:text-brown-muted/50 focus:outline-none focus:ring-2 focus:ring-saffron/30 focus:border-saffron/50 transition-all"
               />
@@ -451,7 +486,7 @@ function SearchPageContent() {
               </div>
             </div>
 
-            <Button size="sm" className="hidden sm:inline-flex bg-saffron hover:bg-saffron-light text-cream gap-1">
+            <Button size="sm" className="hidden sm:inline-flex bg-saffron hover:bg-saffron-light text-cream gap-1" onClick={handleSearch}>
               Search <ArrowUpRight className="w-3.5 h-3.5" />
             </Button>
           </div>
@@ -460,11 +495,11 @@ function SearchPageContent() {
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-2">
               <h1 className="font-serif font-bold text-ink">
-                {query}
+                {query || 'All Dishes'}
                 <span className="text-sm font-sans text-brown-muted font-normal ml-2">in {selectedCity}</span>
               </h1>
               <span className="text-xs text-brown-muted bg-cream-dark px-2 py-0.5 rounded-full">
-                {resultCount} results
+                {loading ? '...' : `${resultCount} results`}
               </span>
             </div>
 
@@ -543,30 +578,49 @@ function SearchPageContent() {
           {/* Results Area (Right 75%) */}
           <div className="flex-1 min-w-0">
             <div className="space-y-5">
-              {/* Top Result - Special #1 Treatment */}
-              <TopResultCard dish={SAMPLE_RESULTS[0]} />
+              {loading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="animate-pulse p-4 rounded-xl bg-cream-dark">
+                      <div className="h-4 bg-brown-muted/10 rounded w-1/3 mb-2" />
+                      <div className="h-3 bg-brown-muted/10 rounded w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              ) : !query ? (
+                <div className="text-center py-16">
+                  <Search className="w-12 h-12 text-brown-muted/40 mx-auto mb-3" />
+                  <h3 className="font-serif text-xl font-bold text-ink mb-1">Search for a dish</h3>
+                  <p className="text-sm text-brown-muted">Try searching for &ldquo;Biryani&rdquo;, &ldquo;Masala Dosa&rdquo;, or any dish you love</p>
+                </div>
+              ) : results.length === 0 ? (
+                <div className="text-center py-16">
+                  <Search className="w-12 h-12 text-brown-muted/40 mx-auto mb-3" />
+                  <h3 className="font-serif text-xl font-bold text-ink mb-1">No dishes found</h3>
+                  <p className="text-sm text-brown-muted">No results for &ldquo;{query}&rdquo;. Try a different dish name.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Top Result - Special #1 Treatment */}
+                  <TopResultCard dish={results[0]} />
 
-              {/* Divider */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-brown-muted/10" />
-                <span className="text-xs font-medium text-brown-muted uppercase tracking-wider">More results</span>
-                <div className="flex-1 h-px bg-brown-muted/10" />
-              </div>
+                  {/* Divider */}
+                  {results.length > 1 && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-px bg-brown-muted/10" />
+                      <span className="text-xs font-medium text-brown-muted uppercase tracking-wider">More results</span>
+                      <div className="flex-1 h-px bg-brown-muted/10" />
+                    </div>
+                  )}
 
-              {/* Regular Results (2-col grid) */}
-              <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : 'space-y-3'}>
-                {SAMPLE_RESULTS.slice(1).map((dish) => (
-                  <RegularResultCard key={dish.id} dish={dish} viewMode={viewMode} />
-                ))}
-              </div>
-
-              {/* Load More */}
-              <div className="text-center pt-2 pb-8">
-                <button className="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-saffron/30 text-saffron font-semibold rounded-xl hover:bg-saffron/5 hover:border-saffron/50 transition-all text-sm active:scale-[0.97]">
-                  Load More Results
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </div>
+                  {/* Regular Results */}
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : 'space-y-3'}>
+                    {results.slice(1).map((dish) => (
+                      <RegularResultCard key={dish.id} dish={dish} viewMode={viewMode} />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -609,7 +663,7 @@ function SearchPageContent() {
                   onClick={() => setMobileFiltersOpen(false)}
                   className="w-full py-3 bg-saffron text-cream rounded-xl font-semibold hover:bg-saffron-light transition-all active:scale-[0.98] shadow-sm"
                 >
-                  Show {resultCount} Results
+                  {loading ? 'Loading...' : `Show ${resultCount} Results`}
                 </button>
               </div>
             </div>

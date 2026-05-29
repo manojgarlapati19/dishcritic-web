@@ -103,7 +103,7 @@ export default function DishPage() {
         const leaderboardData = await getDishLeaderboard(dishName, cityId)
         if (leaderboardData.length > 0) {
           setLeaderboard(
-            leaderboardData.map((d: Dish & { restaurant: Restaurant }, i) => ({
+            leaderboardData.map((d: Dish, i) => ({
               id: d.restaurant?.id || String(i),
               name: d.restaurant?.name || 'Unknown',
               score: d.score,
